@@ -3,174 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Quick Absen - Mode Demo</title>
+    <title>AbsenKita v2.0</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #eef2f7;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; color: #333;
         }
-        .container { width: 100%; max-width: 400px; }
-        .card {
-            background: white;
-            border-radius: 30px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
-        .title {
-            text-align: center;
-            color: #4a4ae1;
-            margin-bottom: 25px;
-            font-weight: 800;
-            font-size: 1.5rem;
-        }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; color: #555; }
-        input, select {
-            width: 100%; padding: 14px; border: 2px solid #f0f0f0; border-radius: 15px;
-            font-size: 1rem; outline: none; transition: 0.3s; background: #fafafa;
-        }
-        input:focus { border-color: #4a4ae1; background: white; }
+        .container { width: 100%; max-width: 400px; position: relative; }
         
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 35px 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .title { text-align: center; font-size: 1.8rem; font-weight: 800; color: #007bff; margin-bottom: 10px; }
+        .subtitle { text-align: center; font-size: 0.9rem; color: #666; margin-bottom: 30px; }
+
+        /* FORM STYLES */
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; color: #444; }
+        input, select {
+            width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 15px;
+            font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: #0093E9; }
+
         .btn {
-            width: 100%; padding: 15px; border: none; border-radius: 15px;
+            width: 100%; padding: 16px; border: none; border-radius: 15px;
             font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s;
         }
-        .btn-camera { background: #4a4ae1; color: white; margin-top: 10px; }
-        .btn-submit { background: #00d1b2; color: white; margin-top: 15px; display: none; }
+        .btn-primary { background: #0093E9; color: white; margin-bottom: 15px; }
+        .btn-outline { background: white; border: 2px solid #0093E9; color: #0093E9; }
+        .btn-camera { background: #333; color: white; margin-top: 10px; }
+        .btn-submit { background: #28a745; color: white; margin-top: 20px; display: none; }
 
         #photoPreview {
-            width: 100%; border-radius: 15px; margin-top: 15px; 
-            display: none; border: 3px solid #eef2f7;
+            width: 100%; border-radius: 20px; margin-top: 15px; display: none;
+            border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        /* Layar Sukses */
-        .success-screen { text-align: center; display: none; }
-        .icon-check { width: 70px; height: 70px; background: #00d1b2; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px; }
-        .lock-notice { color: #ff3860; font-size: 0.8rem; font-weight: 700; margin-top: 25px; padding: 10px; border: 1px dashed #ff3860; border-radius: 10px; }
+        /* LAYERS */
+        .hidden { display: none; }
+        .success-screen { text-align: center; }
+        .lock-badge { 
+            background: #fff0f0; color: #e74c3c; padding: 10px; border-radius: 12px; 
+            font-weight: 800; font-size: 0.75rem; margin-top: 30px; display: inline-block;
+        }
+
+        footer { text-align: center; margin-top: 20px; color: white; font-size: 0.7rem; opacity: 0.8; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- FORM ISI DATA (LANGSUNG MUNCUL) -->
-    <div id="absensiCard" class="card">
-        <h2 class="title">Absensi Siswa</h2>
+    
+    <!-- 1. TAMPILAN DEPAN (LOGIN/DAFTAR PAJANGAN) -->
+    <div id="viewAuth" class="card">
+        <h1 class="title">AbsenKita</h1>
+        <p class="subtitle">Sistem Absensi Digital Siswa</p>
+        
+        <div class="form-group">
+            <label>NIS / Username</label>
+            <input type="text" placeholder="Masukkan NIS..." id="fakeUser">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" placeholder="••••••••" id="fakePass">
+        </div>
+        
+        <!-- Tombol ini langsung arahkan ke form tanpa cek password -->
+        <button class="btn btn-primary" onclick="goToStep('viewForm')">Login</button>
+        <button class="btn btn-outline" onclick="alert('Fitur Daftar dalam pemeliharaan. Gunakan Login Demo.')">Daftar Akun</button>
+    </div>
+
+    <!-- 2. TAMPILAN ISI DATA -->
+    <div id="viewForm" class="card hidden">
+        <h2 class="title" style="font-size: 1.4rem;">Data Kehadiran</h2>
+        <p class="subtitle">Silakan lengkapi detail hari ini</p>
         
         <div class="form-group">
             <label>Nama Lengkap</label>
-            <input type="text" id="inNama" placeholder="Ketik nama kamu...">
+            <input type="text" id="realNama" placeholder="Siapa namamu?">
         </div>
 
         <div class="form-group">
             <label>Kelas</label>
-            <select id="inKelas">
-                <option value="X">Kelas X (Sepuluh)</option>
-                <option value="XI">Kelas XI (Sebelas)</option>
-                <option value="XII">Kelas XII (Dua Belas)</option>
+            <select id="realKelas">
+                <option>X - IPA 1</option>
+                <option>XI - IPS 2</option>
+                <option>XII - Bahasa</option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Keterangan</label>
-            <select id="inKet">
-                <option value="Tepat Waktu">Tepat Waktu</option>
-                <option value="Terlambat">Terlambat</option>
-                <option value="Tidak Terlambat">Tidak Terlambat</option>
+            <select id="realKet">
+                <option>Tepat Waktu</option>
+                <option>Tidak Terlambat</option>
+                <option>Terlambat</option>
             </select>
         </div>
-        
-        <button class="btn btn-camera" onclick="openCamera()">📸 Ambil Foto Selfie</button>
-        <img id="photoPreview" alt="Foto Siswa">
-        
-        <button class="btn btn-submit" id="btnSubmit" onclick="kirimData()">Kirim Absensi Sekarang</button>
+
+        <button class="btn btn-camera" onclick="captureSelfie()">📸 Ambil Foto Selfie</button>
+        <img id="photoPreview">
+
+        <button class="btn btn-submit" id="btnKirim" onclick="prosesSelesai()">Kirim & Kunci Absensi</button>
     </div>
 
-    <!-- LAYAR TERKUNCI -->
-    <div id="lockedCard" class="card success-screen">
-        <div class="icon-check">✓</div>
-        <h2 style="color: #00d1b2;">Berhasil!</h2>
-        <p id="msgSukses" style="margin: 15px 0; color: #555; line-height: 1.5;"></p>
+    <!-- 3. TAMPILAN SUKSES & TERKUNCI -->
+    <div id="viewLocked" class="card hidden success-screen">
+        <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
+        <h2 style="color: #28a745;">Berhasil Terkirim!</h2>
+        <p id="msgNama" style="margin: 15px 0; font-weight: 600;"></p>
         
-        <div style="background: #f9f9f9; padding: 15px; border-radius: 15px; font-size: 0.9rem;">
-            <p><strong>Jam:</strong> <span id="resJam"></span></p>
-            <p><strong>Status:</strong> <span id="resStatus"></span></p>
+        <div style="background: #f0f7ff; padding: 15px; border-radius: 20px; text-align: left; font-size: 0.9rem;">
+            <p>🕒 <strong>Waktu:</strong> <span id="resWaktu"></span></p>
+            <p>📝 <strong>Status:</strong> <span id="resStatus"></span></p>
         </div>
 
-        <div class="lock-notice">
-            🔒 AKSES TERKUNCI<br>Kamu sudah absen hari ini.
-        </div>
-        <button onclick="resetDemo()" style="margin-top: 20px; background: none; border: none; color: #ccc; cursor: pointer; font-size: 0.7rem;">(Reset Demo untuk Coba Lagi)</button>
+        <div class="lock-badge">🔒 AKSES TERKUNCI HINGGA BESOK</div>
+        <br>
+        <button onclick="localStorage.clear(); location.reload();" style="margin-top: 25px; border:none; background:none; color:#bbb; font-size:0.6rem; cursor:pointer;">[ Reset Demo ]</button>
     </div>
+
+    <footer>© 2026 Deby Verona • SMK Digital Indonesia</footer>
 </div>
 
 <script>
-    let capturedPhoto = null;
+    // Fungsi navigasi antar layar
+    function goToStep(stepId) {
+        document.getElementById('viewAuth').classList.add('hidden');
+        document.getElementById('viewForm').classList.add('hidden');
+        document.getElementById('viewLocked').classList.add('hidden');
+        document.getElementById(stepId).classList.remove('hidden');
+    }
 
-    // Cek apakah sudah absen hari ini (Auto-Lock)
+    // Auto-lock check
     window.onload = () => {
-        const hasAbsen = localStorage.getItem('demo_absen_hari_ini');
-        if (hasAbsen) {
-            tampilkanLayarTerkunci();
+        if (localStorage.getItem('isLocked')) {
+            renderLocked();
+            goToStep('viewLocked');
         }
-    };
+    }
 
-    function openCamera() {
-        const picker = document.createElement('input');
-        picker.type = 'file';
-        picker.accept = 'image/*';
-        picker.capture = 'user'; 
-        
-        picker.onchange = (e) => {
+    // Ambil Foto
+    function captureSelfie() {
+        const input = document.createElement('input');
+        input.type = 'file'; input.accept = 'image/*'; input.capture = 'user';
+        input.onchange = (e) => {
             const reader = new FileReader();
-            reader.onload = (ev) => {
-                capturedPhoto = ev.target.result;
-                const img = document.getElementById('photoPreview');
-                img.src = capturedPhoto;
-                img.style.display = 'block';
-                document.getElementById('btnSubmit').style.display = 'block';
-            };
+            reader.onload = (f) => {
+                document.getElementById('photoPreview').src = f.target.result;
+                document.getElementById('photoPreview').style.display = 'block';
+                document.getElementById('btnKirim').style.display = 'block';
+            }
             reader.readAsDataURL(e.target.files[0]);
-        };
-        picker.click();
+        }
+        input.click();
     }
 
-    function kirimData() {
-        const nama = document.getElementById('inNama').value;
-        const ket = document.getElementById('inKet').value;
+    // Submit & Lock
+    function prosesSelesai() {
+        const nama = document.getElementById('realNama').value;
+        if (!nama) return alert("Isi namamu dulu ya!");
 
-        if (!nama) return alert("Nama jangan dikosongin ya!");
+        const jam = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+        const ket = document.getElementById('realKet').value;
 
-        const jam = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        
-        // Simpan data biar terkunci
-        localStorage.setItem('demo_absen_hari_ini', 'true');
-        localStorage.setItem('demo_nama', nama);
-        localStorage.setItem('demo_jam', jam);
-        localStorage.setItem('demo_ket', ket);
+        localStorage.setItem('isLocked', 'true');
+        localStorage.setItem('dataNama', nama);
+        localStorage.setItem('dataJam', jam);
+        localStorage.setItem('dataKet', ket);
 
-        tampilkanLayarTerkunci();
+        renderLocked();
+        goToStep('viewLocked');
     }
 
-    function tampilkanLayarTerkunci() {
-        document.getElementById('absensiCard').style.display = 'none';
-        document.getElementById('lockedCard').style.display = 'block';
-
-        const nama = localStorage.getItem('demo_nama');
-        document.getElementById('msgSukses').innerText = `Selamat ${nama}, kamu sudah berhasil melakukan absensi!`;
-        document.getElementById('resJam').innerText = localStorage.getItem('demo_jam') + " WIB";
-        document.getElementById('resStatus').innerText = localStorage.getItem('demo_ket');
-    }
-
-    // Fungsi khusus buat kamu biar bisa ngetes berulang kali tanpa hapus cache
-    function resetDemo() {
-        localStorage.clear();
-        location.reload();
+    function renderLocked() {
+        document.getElementById('msgNama').innerText = "Selamat " + localStorage.getItem('dataNama') + ", absensi kamu telah diterima.";
+        document.getElementById('resWaktu').innerText = localStorage.getItem('dataJam') + " WIB";
+        document.getElementById('resStatus').innerText = localStorage.getItem('dataKet');
     }
 </script>
 
