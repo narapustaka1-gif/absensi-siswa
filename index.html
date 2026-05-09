@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Premium | SMA Bahagia</title>
+    <title>Premium Attendance | SMA Bahagia</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.185/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -11,302 +11,301 @@
 
     <style>
         :root {
-            --bg-color: #f8fafc;
             --primary: #4f46e5;
-            --secondary: #ec4899;
             --accent: #10b981;
-            --glass: rgba(255, 255, 255, 0.85);
-            --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --danger: #ef4444;
+            --glass: rgba(255, 255, 255, 0.92);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: 20px;
-            color: #1e293b;
         }
 
-        /* Elegant Toast Notif */
-        #toast {
-            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            padding: 16px 30px; border-radius: 50px; color: white; font-weight: 600;
-            z-index: 10000; transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 0.9rem;
-        }
-        #toast.show { transform: translateX(-50%) translateY(0); }
+        .container { width: 100%; max-width: 480px; position: relative; }
 
-        .app-container { width: 100%; max-width: 450px; }
-
-        /* Aesthetic Card */
+        /* Card Aesthetic */
         .card {
             background: var(--glass);
-            backdrop-filter: blur(15px);
-            border-radius: 32px;
-            padding: 40px 30px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: var(--card-shadow);
-            animation: fadeIn 0.6s ease-out;
+            backdrop-filter: blur(25px);
+            border-radius: 35px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.3);
+            margin-top: 15px;
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         .hidden { display: none !important; }
 
-        /* Titles */
-        h1 { font-weight: 800; color: white; text-align: center; margin-bottom: 25px; letter-spacing: -1px; font-size: 1.8rem; }
-        h2 { font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 20px; font-size: 1.4rem; }
+        /* Typography */
+        h1 { color: white; text-align: center; font-weight: 800; font-size: 1.8rem; letter-spacing: -1px; }
+        .school-info { color: #94a3b8; text-align: center; font-size: 0.75rem; letter-spacing: 3px; margin-bottom: 10px; font-weight: 600; }
 
-        /* Aesthetic Buttons */
+        /* List Live Data */
+        .live-container { margin-top: 20px; max-height: 380px; overflow-y: auto; padding-right: 5px; }
+        .item {
+            background: white; border-radius: 22px; padding: 14px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 14px; border: 1px solid #f1f5f9;
+            transition: 0.3s;
+        }
+        .item img { width: 55px; height: 55px; border-radius: 16px; object-fit: cover; border: 2px solid #f1f5f9; }
+        .info { flex: 1; }
+        .info b { font-size: 0.95rem; color: #1e293b; display: block; }
+        .info span { font-size: 0.75rem; color: #64748b; font-weight: 500; }
+        .status-badge { font-size: 0.65rem; font-weight: 800; padding: 5px 10px; border-radius: 10px; text-transform: uppercase; }
+        .sh { background: #dcfce7; color: #10b981; }
+        .st { background: #fee2e2; color: #ef4444; }
+
+        /* Button UI */
         .btn {
             width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 700;
-            font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease;
-            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px;
         }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
-        .btn-primary:active { transform: scale(0.97); }
+        .btn-main { background: var(--primary); color: white; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
         .btn-white { background: white; color: var(--primary); border: 2px solid #e2e8f0; }
-        .btn-danger { background: #fee2e2; color: #ef4444; }
-        .btn-back { background: transparent; color: #64748b; font-weight: 500; font-size: 0.85rem; }
+        .btn-back { background: transparent; color: #64748b; font-size: 0.85rem; }
 
-        /* Form Inputs */
-        .input-box { margin-bottom: 20px; position: relative; }
-        .input-box label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-left: 5px; margin-bottom: 8px; }
-        .input-box input, .input-box select {
-            width: 100%; padding: 16px; border-radius: 16px; border: 2px solid #e2e8f0; background: rgba(255,255,255,0.5);
-            font-size: 1rem; transition: all 0.3s;
+        /* Input UI */
+        .field { margin-bottom: 18px; }
+        .field label { display: block; font-size: 0.7rem; font-weight: 800; color: #475569; margin-bottom: 6px; padding-left: 5px; }
+        input, select { width: 100%; padding: 16px; border-radius: 15px; border: 2px solid #e2e8f0; background: white; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--primary); }
+
+        /* Toast Notif */
+        #toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: white; padding: 14px 28px; border-radius: 50px;
+            font-weight: 600; z-index: 2000; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: none; font-size: 0.9rem;
         }
-        .input-box input:focus { border-color: var(--primary); background: white; outline: none; }
 
-        /* Dashboard Guru Mobile */
-        .list-container { margin-top: 25px; max-height: 350px; overflow-y: auto; padding-right: 5px; }
-        .student-card {
-            background: white; border-radius: 20px; padding: 15px; margin-bottom: 12px;
-            display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
-        .student-card img { width: 55px; height: 55px; border-radius: 15px; object-fit: cover; }
-        .student-info b { font-size: 1rem; color: #0f172a; display: block; }
-        .student-info span { font-size: 0.75rem; color: #64748b; font-weight: 500; }
-        .badge { padding: 4px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; margin-left: auto; }
-        .badge-present { background: #dcfce7; color: #10b981; }
-        .badge-late { background: #fee2e2; color: #ef4444; }
+        /* Footer */
+        .footer { margin-top: 40px; text-align: center; color: white; font-size: 0.8rem; opacity: 0.8; }
+        .footer span { display: block; font-weight: 800; color: #818cf8; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Footer Copyright */
-        .footer {
-            margin-top: 40px; text-align: center; color: rgba(255, 255, 255, 0.9);
-            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.5px;
-        }
-        .footer .name { font-weight: 800; text-transform: uppercase; margin-top: 5px; display: block; }
-
-        /* Control UI */
-        .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div id="toast"></div>
 
-    <div class="app-container">
-        <h1>SMA BAHAGIA</h1>
+    <div class="container">
+        <div class="school-info">SMA BAHAGIA INDONESIA</div>
+        <h1>ABSENSI DIGITAL</h1>
 
-        <!-- VIEW: MENU UTAMA -->
-        <div id="vMain" class="card">
-            <h2>Pilih Portal</h2>
-            <p style="text-align:center; color:#64748b; font-size:0.9rem; margin-bottom:30px;">Selamat datang di Sistem Absensi Digital</p>
-            <button class="btn btn-primary" onclick="checkGate('vNIS')">Portal Siswa</button>
-            <button class="btn btn-white" onclick="go('vLogin')">Portal Guru</button>
+        <!-- HALAMAN 1: LIST ABSENSI TERBARU (REALTIME) -->
+        <div id="viewLive" class="card">
+            <h2 style="font-size: 1.2rem; margin-bottom: 15px; text-align: center;">Daftar Hadir Siswa</h2>
+            <div id="listLive" class="live-container"></div>
+            <div style="margin-top: 25px;">
+                <button class="btn btn-main" onclick="nav('viewNIS')">Mulai Absen</button>
+                <button class="btn btn-white" onclick="nav('viewLogin')">Portal Guru</button>
+            </div>
         </div>
 
-        <!-- VIEW: SISWA NIS -->
-        <div id="vNIS" class="card hidden">
-            <h2>Verifikasi NIS</h2>
-            <div class="input-box">
-                <label>Nomor Induk Siswa</label>
+        <!-- HALAMAN 2: INPUT NIS -->
+        <div id="viewNIS" class="card hidden">
+            <h2 style="text-align: center; margin-bottom: 20px;">Verifikasi Diri</h2>
+            <div class="field">
+                <label>NOMOR INDUK SISWA</label>
                 <input type="number" id="inNIS" placeholder="Masukkan NIS Anda">
             </div>
-            <button class="btn btn-primary" onclick="go('vForm')">Lanjutkan</button>
-            <button class="btn btn-back" onclick="go('vMain')">Batal</button>
+            <button class="btn btn-main" onclick="nav('viewForm')">Lanjutkan</button>
+            <button class="btn btn-back" onclick="nav('viewLive')">Batal</button>
         </div>
 
-        <!-- VIEW: SISWA FORM -->
-        <div id="vForm" class="card hidden">
-            <h2>Detail Absensi</h2>
-            <div class="input-box"><label>Nama Lengkap</label><input type="text" id="inNama" placeholder="Nama sesuai absen"></div>
-            <div class="input-box"><label>Pilih Kelas</label><select id="inKelas"><option>X - Bahagia</option><option>XI - Bahagia</option><option>XII - Bahagia</option></select></div>
-            <button class="btn btn-white" onclick="takePic()">📸 Ambil Foto Selfie</button>
-            <img id="prev" style="width:100%; border-radius:20px; margin:15px 0; display:none; border:2px solid white;">
-            <button id="btnKirim" class="btn btn-primary hidden" onclick="saveData()">Kirim Kehadiran</button>
-            <button class="btn btn-back" onclick="go('vNIS')">Kembali</button>
+        <!-- HALAMAN 3: FORM DATA -->
+        <div id="viewForm" class="card hidden">
+            <h2 style="text-align: center; margin-bottom: 20px;">Lengkapi Profil</h2>
+            <div class="field"><label>NAMA LENGKAP</label><input type="text" id="inNama" placeholder="Nama Anda"></div>
+            <div class="field"><label>KELAS</label><select id="inKelas"><option>X - Bahagia</option><option>XI - Bahagia</option><option>XII - Bahagia</option></select></div>
+            <button class="btn btn-white" onclick="camera()">📸 Foto Selfie</button>
+            <img id="preview" style="width:100%; border-radius:20px; margin:15px 0; display:none; border: 3px solid white;">
+            <button id="btnSend" class="btn btn-main hidden" onclick="saveAbsen()">Kirim Sekarang</button>
+            <button class="btn btn-back" onclick="nav('viewNIS')">Kembali</button>
         </div>
 
-        <!-- VIEW: SUKSES -->
-        <div id="vSuccess" class="card hidden" style="text-align:center;">
-            <div style="font-size:60px; margin-bottom:15px;">🌟</div>
-            <h2>Absen Berhasil!</h2>
-            <p style="color:#64748b; margin-bottom:25px;">Terima kasih, data kamu sudah tersimpan dengan aman.</p>
-            <button class="btn btn-primary" onclick="finish()">Selesai</button>
+        <!-- HALAMAN 4: LOGIN GURU -->
+        <div id="viewLogin" class="card hidden">
+            <h2 style="text-align: center; margin-bottom: 20px;">Akses Admin</h2>
+            <div class="field"><input type="text" id="user" placeholder="Username"></div>
+            <div class="field"><input type="text" id="nick" placeholder="Panggilan"></div>
+            <div class="field"><input type="password" id="pass" placeholder="Password"></div>
+            <button class="btn btn-main" onclick="login()">Buka Website</button>
+            <button class="btn btn-back" onclick="nav('viewLive')">Kembali</button>
         </div>
 
-        <!-- VIEW: GURU LOGIN -->
-        <div id="vLogin" class="card hidden">
-            <h2>Admin Login</h2>
-            <div class="input-box"><input type="text" id="gE" placeholder="Username"></div>
-            <div class="input-box"><input type="text" id="gN" placeholder="Panggilan"></div>
-            <div class="input-box"><input type="password" id="gP" placeholder="Password"></div>
-            <button class="btn btn-primary" onclick="auth()">Buka Website</button>
-            <button class="btn btn-back" onclick="go('vMain')">Kembali</button>
-        </div>
-
-        <!-- VIEW: GURU DASHBOARD -->
-        <div id="vDash" class="card hidden">
+        <!-- HALAMAN 5: DASHBOARD GURU -->
+        <div id="viewDash" class="card hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 style="font-weight:800;">Log Absensi</h3>
-                <button onclick="logout()" style="color:#ef4444; border:none; background:none; font-weight:700; cursor:pointer; font-size:0.8rem;">LOGOUT</button>
+                <h2 style="font-size:1.1rem;">Dashboard Guru</h2>
+                <button onclick="logout()" style="color:var(--danger); border:none; background:none; font-weight:800; cursor:pointer;">KELUAR</button>
             </div>
 
-            <div class="list-container" id="siswaList"></div>
+            <div id="listDash" class="live-container"></div>
 
-            <div class="control-grid">
-                <button class="btn btn-white" style="margin-top:20px;" onclick="go('vControl')">⚙️ Kontrol</button>
-                <button class="btn btn-primary" style="margin-top:20px;" onclick="exportExcel()">📊 Excel</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
+                <button class="btn btn-white" style="margin:0; font-size:0.7rem;" onclick="exportExcel()">📊 EXCEL</button>
+                <button class="btn btn-white" style="margin:0; font-size:0.7rem;" onclick="exportPDF()">📄 PDF</button>
             </div>
-            <button class="btn btn-danger" style="margin-top:10px; font-size:0.8rem;" onclick="exportPDF()">Cetak PDF</button>
-        </div>
-
-        <!-- VIEW: GURU CONTROL -->
-        <div id="vControl" class="card hidden">
-            <h2>Panel Kontrol</h2>
-            <div style="background:white; padding:20px; border-radius:24px; margin-top:10px;">
-                <label style="font-size:0.7rem; font-weight:800; color:#64748b;">STATUS SISTEM</label>
-                <div class="control-grid">
-                    <button class="btn btn-danger" onclick="setLock(true)">KUNCI</button>
-                    <button class="btn btn-primary" style="background:var(--accent);" onclick="setLock(false)">BUKA</button>
+            
+            <div style="background:#f1f5f9; padding:15px; border-radius:20px; margin-top:15px; text-align:center;">
+                <p style="font-size:0.65rem; font-weight:800; color:#64748b; margin-bottom:10px;">KONTROL AKSES SISWA</p>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-main" style="margin:0; background:var(--danger); flex:1;" onclick="setGate(true)">KUNCI</button>
+                    <button class="btn btn-main" style="margin:0; background:var(--accent); flex:1;" onclick="setGate(false)">BUKA</button>
                 </div>
             </div>
-            <button class="btn btn-back" onclick="go('vDash')">Kembali ke Daftar</button>
         </div>
 
-        <!-- FOOTER HAK CIPTA -->
         <div class="footer">
-            Hak Cipta © 2026 
-            <span class="name">dibuat oleh Deby Verona</span>
+            Hak Cipta © 2026
+            <span>dibuat oleh Deby Verona</span>
         </div>
     </div>
 
 <script>
-    let rawPhoto = "";
+    let currentPhoto = "";
 
-    function showToast(msg, bg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg; t.style.background = bg;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
-    }
+    // REAL-TIME LISTENER (Supaya data langsung masuk tanpa refresh)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'db_verona') {
+            renderData();
+        }
+    });
 
-    function go(id) {
+    // SISTEM STANDBY (Navigasi tetap di halaman terakhir)
+    function nav(id) {
         document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
-        if(id === 'vDash') render();
+        localStorage.setItem('activePage', id);
+        if(id === 'viewLive' || id === 'viewDash') renderData();
     }
 
-    function checkGate(target) {
-        if(localStorage.getItem('sysLock') === 'true' || localStorage.getItem('userDone') === 'true') {
-            showToast("Akses sudah ditutup atau Anda sudah absen!", "#ef4444");
-        } else { go(target); }
+    window.onload = () => {
+        const savedPage = localStorage.getItem('activePage') || 'viewLive';
+        const isGuru = sessionStorage.getItem('isGuru');
+        
+        if (isGuru === 'true' && savedPage === 'viewDash') {
+            nav('viewDash');
+        } else {
+            nav('viewLive');
+        }
+    };
+
+    function showToast(m) {
+        const t = document.getElementById('toast');
+        t.innerText = m; t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
     }
 
-    // SISWA LOGIC
-    function takePic() {
+    // SISWA FUNCTIONS
+    function camera() {
         const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.capture='user';
         i.onchange = e => {
             const r = new FileReader();
             r.onload = f => {
-                rawPhoto = f.target.result;
-                const p = document.getElementById('prev');
-                p.src = rawPhoto; p.style.display = 'block';
-                document.getElementById('btnKirim').classList.remove('hidden');
+                currentPhoto = f.target.result;
+                const p = document.getElementById('preview');
+                p.src = currentPhoto; p.style.display = 'block';
+                document.getElementById('btnSend').classList.remove('hidden');
             };
             r.readAsDataURL(e.target.files[0]);
         };
         i.click();
     }
 
-    function saveData() {
+    function saveAbsen() {
         const n = document.getElementById('inNama').value;
         const k = document.getElementById('inKelas').value;
-        if(!n) return showToast("Nama wajib diisi!", "#ef4444");
+        const isLocked = localStorage.getItem('gateLocked') === 'true';
+
+        if(isLocked) return showToast("Maaf, Absensi sudah dikunci guru!");
+        if(!n) return showToast("Nama harus diisi!");
 
         const d = new Date();
         const jam = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
         const st = d.getHours() >= 8 ? "Terlambat" : "Hadir";
 
-        let db = JSON.parse(localStorage.getItem('absensi_pro')) || [];
-        db.push({n, k, jam, st, p:rawPhoto});
-        localStorage.setItem('absensi_pro', JSON.stringify(db));
-        go('vSuccess');
+        let db = JSON.parse(localStorage.getItem('db_verona')) || [];
+        db.push({n, k, jam, st, p:currentPhoto});
+        localStorage.setItem('db_verona', JSON.stringify(db)); // Trigger storage listener
+        
+        showToast("Absensi Berhasil Terkirim!");
+        nav('viewLive');
     }
 
-    function finish() {
-        localStorage.setItem('userDone', 'true');
-        location.reload();
+    // GURU FUNCTIONS
+    function login() {
+        if(document.getElementById('user').value === "deby verona" && 
+           document.getElementById('nick').value === "vero" && 
+           document.getElementById('pass').value === "patrobas") {
+            sessionStorage.setItem('isGuru', 'true');
+            nav('viewDash');
+            showToast("Selamat Datang, Admin!");
+        } else { showToast("Login Gagal!"); }
     }
 
-    // GURU LOGIC
-    function auth() {
-        if(document.getElementById('gE').value === "deby verona" && 
-           document.getElementById('gN').value === "vero" && 
-           document.getElementById('gP').value === "patrobas") {
-            sessionStorage.setItem('isAdmin', 'true');
-            go('vDash');
-            showToast("Login Berhasil", "var(--accent)");
-        } else { showToast("Data tidak valid!", "#ef4444"); }
-    }
-
-    function render() {
-        const db = JSON.parse(localStorage.getItem('absensi_pro')) || [];
-        const container = document.getElementById('siswaList');
-        container.innerHTML = db.length ? "" : "<p style='text-align:center; color:#94a3b8; font-size:0.8rem;'>Belum ada siswa absen.</p>";
-        db.reverse().forEach(s => {
-            container.innerHTML += `
-                <div class="student-card">
-                    <img src="${s.p}">
-                    <div class="student-info">
-                        <b>${s.n}</b>
-                        <span>${s.k} • ${s.jam} WIB</span>
-                    </div>
-                    <div class="badge ${s.st === 'Hadir' ? 'badge-present' : 'badge-late'}">${s.st}</div>
-                </div>`;
+    function renderData() {
+        const db = JSON.parse(localStorage.getItem('db_verona')) || [];
+        const targets = [document.getElementById('listLive'), document.getElementById('listDash')];
+        
+        targets.forEach(t => {
+            if(!t) return;
+            t.innerHTML = db.length ? "" : "<p style='text-align:center; font-size:0.8rem; color:#94a3b8; margin:30px 0;'>Menunggu data masuk...</p>";
+            [...db].reverse().forEach(s => {
+                t.innerHTML += `
+                    <div class="item">
+                        <img src="${s.p}">
+                        <div class="info">
+                            <b>${s.n}</b>
+                            <span>${s.k} • ${s.jam} WIB</span>
+                        </div>
+                        <div class="status-badge ${s.st==='Hadir'?'sh':'st'}">${s.st}</div>
+                    </div>`;
+            });
         });
     }
 
-    function setLock(val) {
-        localStorage.setItem('sysLock', val);
-        showToast(val ? "Website Dikunci" : "Website Dibuka", val ? "#ef4444" : "var(--accent)");
+    function setGate(v) {
+        localStorage.setItem('gateLocked', v);
+        showToast(v ? "Sistem Absensi Dikunci" : "Sistem Absensi Dibuka");
     }
 
+    function logout() {
+        sessionStorage.clear();
+        localStorage.removeItem('activePage');
+        location.reload();
+    }
+
+    // EXPORT
     function exportExcel() {
-        const db = JSON.parse(localStorage.getItem('absensi_pro')) || [];
-        const ws = XLSX.utils.json_to_sheet(db.map(s => ({ Nama: s.n, Kelas: s.k, Jam: s.jam, Status: s.st })));
+        const db = JSON.parse(localStorage.getItem('db_verona')) || [];
+        const ws = XLSX.utils.json_to_sheet(db.map(s => ({Nama:s.n, Kelas:s.k, Jam:s.jam, Status:s.st})));
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Absensi");
-        XLSX.writeFile(wb, "Laporan_Absensi_SMA_Bahagia.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+        XLSX.writeFile(wb, "Absensi_SMA_Bahagia.xlsx");
     }
 
     function exportPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const db = JSON.parse(localStorage.getItem('absensi_pro')) || [];
-        doc.text("Laporan Kehadiran SMA Bahagia", 14, 15);
-        doc.autoTable({ head: [['Nama', 'Kelas', 'Jam', 'Status']], body: db.map(s => [s.n, s.k, s.jam, s.st]), startY: 20 });
+        const db = JSON.parse(localStorage.getItem('db_verona')) || [];
+        doc.text("Laporan Absensi SMA Bahagia", 14, 15);
+        doc.autoTable({ head:[['Nama','Kelas','Jam','Status']], body:db.map(s=>[s.n, s.k, s.jam, s.st]), startY:20 });
         doc.save("Laporan_Absensi.pdf");
     }
-
-    function logout() { sessionStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
