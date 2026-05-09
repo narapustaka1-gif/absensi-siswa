@@ -3,245 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi SMA Bahagia</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.185/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-
+    <title>Sistem Absensi Terpadu - SMA Bahagia Indonesia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #4f46e5; --a: #10b981; --d: #ef4444; --w: #ffffff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #0f172a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px; overflow-x: hidden; }
-        
-        .container { width: 100%; max-width: 450px; }
-        .card { background: rgba(255,255,255,0.98); border-radius: 28px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin-top: 15px; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        h1 { color: white; text-align: center; font-weight: 800; font-size: 1.6rem; margin-bottom: 5px; }
-        .hidden { display: none !important; }
-        
-        /* List Items */
-        .list-area { margin-top: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px; }
-        .item { background: #f8fafc; border-radius: 18px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; border: 1px solid #e2e8f0; }
-        .item img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; background: #ddd; }
-        .info { flex: 1; }
-        .info b { font-size: 0.9rem; color: #1e293b; display: block; text-transform: capitalize; }
-        .info span { font-size: 0.75rem; color: #64748b; font-weight: 500; }
-        .badge { font-size: 0.65rem; font-weight: 800; padding: 5px 10px; border-radius: 8px; text-transform: uppercase; }
-        .bh { background: #dcfce7; color: #10b981; }
-        .bt { background: #fee2e2; color: #ef4444; }
+        :root {
+            --primary: #6366f1;
+            --secondary: #f43f5e;
+            --accent: #10b981;
+            --bg-gradient: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        }
 
-        /* Buttons & Inputs */
-        .btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; margin-top: 10px; }
-        .btn:active { transform: scale(0.98); }
-        .btn-p { background: var(--p); color: white; }
-        .btn-w { background: white; color: var(--p); border: 2px solid var(--p); }
-        input, select { width: 100%; padding: 15px; border-radius: 14px; border: 2px solid #e2e8f0; font-size: 1rem; margin-top: 8px; outline: none; background: white; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { 
+            background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; 
+        }
+
+        .header { text-align: center; color: white; margin-bottom: 25px; }
+        .header h1 { font-size: 2rem; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 30px;
+            padding: 40px; width: 100%; max-width: 480px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transition: 0.3s; position: relative;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Input & Password Toggle */
+        .input-group { margin-bottom: 18px; position: relative; }
+        label { display: block; font-size: 0.7rem; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
+        input, select {
+            width: 100%; padding: 15px 18px; border-radius: 15px; border: 2px solid #f1f5f9;
+            font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: var(--primary); }
         
-        #toast { position: fixed; top: 20px; background: #1e293b; color: white; padding: 12px 25px; border-radius: 50px; font-weight: 700; z-index: 9999; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .footer { margin-top: 30px; text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem; }
-        .footer b { display: block; color: #818cf8; margin-top: 4px; letter-spacing: 1px; }
+        .pass-container { position: relative; }
+        .toggle-pass {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; font-size: 1.2rem; user-select: none;
+        }
+
+        .btn {
+            width: 100%; padding: 18px; border: none; border-radius: 15px;
+            font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-main { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-danger { background: var(--secondary); color: white; }
+        .btn-ghost { background: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
+
+        /* Timer & Badge */
+        .timer-display { background: #fee2e2; color: #ef4444; padding: 10px; border-radius: 10px; font-weight: 800; text-align: center; margin-bottom: 20px; }
+        .badge { padding: 5px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; }
+        .late { background: #fee2e2; color: #ef4444; }
+        .ontime { background: #dcfce7; color: #10b981; }
+
+        .copyright { margin-top: 25px; color: white; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .circle-c { width: 18px; height: 18px; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.8rem; }
+        td, th { padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: left; }
     </style>
 </head>
 <body>
 
-<div id="toast"></div>
-
-<div class="container">
-    <h1>SMA BAHAGIA</h1>
-    <p style="color:#94a3b8; text-align:center; font-size:0.7rem; letter-spacing:2px; font-weight:600;">SISTEM REALTIME v2.0</p>
-
-    <!-- HALAMAN LIVE FEED (HOME) -->
-    <div id="pLive" class="card">
-        <h2 style="font-size:1.1rem; text-align:center; color:#1e293b;">Daftar Hadir Terkini</h2>
-        <div id="listLive" class="list-area"></div>
-        <button class="btn btn-p" onclick="nav('pNIS')">Masuk Absensi</button>
-        <button class="btn btn-w" onclick="nav('pLogin')">Portal Guru</button>
+    <div class="header">
+        <h1 id="schoolName">SMA Bahagia Indonesia</h1>
     </div>
 
-    <!-- HALAMAN VERIF NIS -->
-    <div id="pNIS" class="card hidden">
-        <h2 style="text-align:center;">Nomor Induk</h2>
-        <input type="number" id="inNIS" placeholder="Masukkan NIS">
-        <button class="btn btn-p" onclick="nav('pForm')">Lanjutkan</button>
-        <button class="btn btn-w" onclick="nav('pLive')" style="border:none;">Kembali</button>
+    <!-- VIEW: SISTEM TERKUNCI ADMIN -->
+    <div id="vSystemLocked" class="card hidden" style="text-align:center;">
+        <div style="font-size:50px;">🔒</div>
+        <h2 style="color:var(--secondary)">Sistem Ditutup</h2>
+        <p style="margin-top:15px; color:#64748b;">Mohon maaf, absensi telah dinonaktifkan oleh Admin/Guru.</p>
+        <button class="btn btn-ghost" onclick="go('vGuruLogin')">Login Admin</button>
     </div>
 
-    <!-- HALAMAN FORM ABSEN -->
-    <div id="pForm" class="card hidden">
-        <h2 style="text-align:center;">Lengkapi Data</h2>
-        <input type="text" id="inNama" placeholder="Nama Lengkap">
-        <select id="inKelas"><option>X - Bahagia</option><option>XI - Bahagia</option><option>XII - Bahagia</option></select>
-        <button class="btn btn-w" onclick="openCam()">📸 Ambil Foto Selfie</button>
-        <img id="preview" style="width:100%; border-radius:18px; margin:15px 0; display:none; border:2px solid #e2e8f0;">
-        <button id="btnKirim" class="btn btn-p hidden" onclick="prosesAbsen()">Kirim Kehadiran</button>
-        <button class="btn btn-w" onclick="nav('pNIS')" style="border:none;">Kembali</button>
+    <!-- VIEW: MENU AWAL -->
+    <div id="vMain" class="card">
+        <div id="timerSiswa" class="timer-display hidden">Sisa Waktu: <span id="timeLeft">00:00</span></div>
+        <h2 style="text-align:center; margin-bottom:25px;">Portal Kehadiran</h2>
+        <button class="btn btn-main" onclick="checkGate('vSiswaLogin')">Masuk Portal Siswa</button>
+        <button class="btn btn-ghost" onclick="go('vGuruLogin')">Dashboard Guru</button>
     </div>
 
-    <!-- HALAMAN LOGIN GURU -->
-    <div id="pLogin" class="card hidden">
-        <h2 style="text-align:center;">Admin Login</h2>
-        <input type="text" id="u" placeholder="Username">
-        <input type="text" id="n" placeholder="Panggilan">
-        <input type="password" id="p" placeholder="Password">
-        <button class="btn btn-p" onclick="doLogin()">Masuk Dashboard</button>
-        <button class="btn btn-w" onclick="nav('pLive')" style="border:none;">Kembali</button>
-    </div>
-
-    <!-- HALAMAN DASHBOARD -->
-    <div id="pDash" class="card hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h2 style="font-size:1.1rem;">Panel Guru</h2>
-            <button onclick="doLogout()" style="color:var(--d); border:none; background:none; font-weight:800; font-size:0.8rem;">LOGOUT</button>
+    <!-- VIEW: SISWA NIS -->
+    <div id="vSiswaLogin" class="card hidden">
+        <h2>Verifikasi NIS</h2>
+        <div class="input-group">
+            <label>Nomor Induk Siswa</label>
+            <input type="number" id="inNIS" placeholder="Masukkan NIS anda">
         </div>
-        <div id="listDash" class="list-area"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
-            <button class="btn btn-w" style="font-size:0.8rem;" onclick="expXL()">📊 EXCEL</button>
-            <button class="btn btn-w" style="font-size:0.8rem;" onclick="expPDF()">📄 PDF</button>
+        <button class="btn btn-main" onclick="go('vSiswaForm')">Validasi Data</button>
+        <button class="btn btn-ghost" onclick="go('vMain')">Batal</button>
+    </div>
+
+    <!-- VIEW: SISWA FORM -->
+    <div id="vSiswaForm" class="card hidden">
+        <h2>Data Lengkap</h2>
+        <div class="input-group"><label>Nama</label><input type="text" id="inNama"></div>
+        <div class="input-group"><label>Kelas</label><select id="inKelas"><option>X - Bahagia</option><option>XI - Bahagia</option><option>XII - Bahagia</option></select></div>
+        <button class="btn btn-ghost" onclick="takePic()">📸 Ambil Selfie</button>
+        <img id="prev" style="width:100%; border-radius:15px; margin:15px 0; display:none; border:2px solid var(--primary);">
+        <button id="btnKirim" class="btn btn-main hidden" onclick="saveAbsen()">Kirim Absen</button>
+    </div>
+
+    <!-- VIEW: BERHASIL -->
+    <div id="vSuccess" class="card hidden" style="text-align:center;">
+        <div style="font-size:50px;">✨</div>
+        <h2 style="color:var(--accent)">Berhasil!</h2>
+        <p id="succMsg" style="margin:15px 0;"></p>
+        <button class="btn btn-main" onclick="resetToHome()">Kembali ke Menu Awal</button>
+    </div>
+
+    <!-- VIEW: GURU LOGIN -->
+    <div id="vGuruLogin" class="card hidden">
+        <h2 style="text-align:center; margin-bottom:20px;">Admin Login</h2>
+        <div class="input-group"><input type="text" id="gE" placeholder="Email"></div>
+        <div class="input-group"><input type="text" id="gN" placeholder="Nama"></div>
+        <div class="input-group pass-container">
+            <input type="password" id="gP" placeholder="Password">
+            <span class="toggle-pass" onclick="togglePass('gP')">👁️</span>
+        </div>
+        <button class="btn btn-main" onclick="authG()">Buka Panel</button>
+        <button class="btn btn-ghost" onclick="go('vMain')">Kembali</button>
+    </div>
+
+    <!-- VIEW: GURU DASHBOARD (CONTROL CENTER) -->
+    <div id="vGuruDash" class="card hidden" style="max-width: 600px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3>Admin Panel</h3>
+            <button onclick="logout()" class="badge late" style="border:none; cursor:pointer;">Keluar</button>
+        </div>
+        
+        <div style="background:#f8fafc; padding:15px; border-radius:15px; margin-bottom:20px;">
+            <label>Kontrol Website:</label>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button id="btnLock" class="btn btn-danger" style="padding:10px;" onclick="toggleSystemLock(true)">Kunci Web</button>
+                <button id="btnUnlock" class="btn btn-main" style="padding:10px; background:var(--accent);" onclick="toggleSystemLock(false)">Buka Web</button>
+            </div>
+            <div style="margin-top:15px;">
+                <label>Atur Timer Absensi (Menit):</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="timerInput" placeholder="Menit" style="padding:10px;">
+                    <button class="btn btn-main" style="width:120px; padding:10px;" onclick="startTimer()">Set Timer</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table>
+                <thead><tr><th>Nama</th><th>Waktu</th><th>Status</th></tr></thead>
+                <tbody id="listG"></tbody>
+            </table>
         </div>
     </div>
 
-    <div class="footer">Hak Cipta © 2026 <b>dibuat oleh Deby Verona</b></div>
-</div>
-
-<canvas id="canvas" style="display:none;"></canvas>
+    <div class="copyright">
+        <div class="circle-c">c</div> (dibuat oleh Deby Verona)
+    </div>
 
 <script>
-    let photoStr = "";
+    let currentImg = "";
+    let timerInterval;
 
-    // SINKRONISASI NAVIGASI & STANDBY
-    function nav(id) {
-        document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-        const target = document.getElementById(id);
-        if(target) target.classList.remove('hidden');
-        
-        localStorage.setItem('current_pos', id);
-        if(id === 'pLive' || id === 'pDash') render();
-    }
-
-    // AUTO STANDBY SAAT REFRESH
     window.onload = () => {
-        const last = localStorage.getItem('current_pos') || 'pLive';
-        const isAuth = sessionStorage.getItem('is_auth');
-        
-        if(isAuth === 'true' && last === 'pDash') {
-            nav('pDash');
-        } else {
-            nav(last === 'pLogin' ? 'pLive' : last);
-        }
+        checkSystemStatus();
+        updateTimerDisplay();
     };
 
-    function showMsg(t) {
-        const x = document.getElementById('toast');
-        x.innerText = t; x.style.display = 'block';
-        setTimeout(() => x.style.display = 'none', 3000);
+    function go(id) {
+        document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        if(id === 'vGuruDash') renderGuru();
     }
 
-    // KAMERA & KOMPRESI (ANTI DELAY)
-    function openCam() {
-        const fileIn = document.createElement('input'); fileIn.type = 'file'; fileIn.accept = 'image/*'; fileIn.capture = 'user';
-        fileIn.onchange = e => {
-            const reader = new FileReader();
-            reader.onload = event => {
-                const img = new Image();
-                img.onload = () => {
-                    const cvs = document.getElementById('canvas');
-                    const ctx = cvs.getContext('2d');
-                    const scale = 350 / img.width;
-                    cvs.width = 350; cvs.height = img.height * scale;
-                    ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
-                    photoStr = cvs.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('preview').src = photoStr;
-                    document.getElementById('preview').style.display = 'block';
-                    document.getElementById('btnKirim').classList.remove('hidden');
-                };
-                img.src = event.target.result;
+    function checkGate(target) {
+        const isLocked = localStorage.getItem('sysLocked') === 'true';
+        if(isLocked) go('vSystemLocked');
+        else go(target);
+    }
+
+    // TOGGLE PASSWORD
+    function togglePass(id) {
+        const el = document.getElementById(id);
+        el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    // ADMIN CONTROL: LOCK/UNLOCK
+    function toggleSystemLock(status) {
+        localStorage.setItem('sysLocked', status);
+        alert(status ? "Website Berhasil DIKUNCI" : "Website Berhasil DIBUKA");
+        checkSystemStatus();
+    }
+
+    function checkSystemStatus() {
+        const isLocked = localStorage.getItem('sysLocked') === 'true';
+        if(isLocked && !sessionStorage.getItem('isGuru')) {
+            go('vSystemLocked');
+        }
+    }
+
+    // ADMIN CONTROL: TIMER
+    function startTimer() {
+        const mins = document.getElementById('timerInput').value;
+        if(!mins) return;
+        const endTime = Date.now() + (mins * 60000);
+        localStorage.setItem('absensiEndTime', endTime);
+        alert("Timer diatur untuk " + mins + " menit.");
+        updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            const end = localStorage.getItem('absensiEndTime');
+            if(!end) return;
+            const now = Date.now();
+            const diff = end - now;
+
+            if(diff <= 0) {
+                clearInterval(timerInterval);
+                localStorage.removeItem('absensiEndTime');
+                localStorage.setItem('sysLocked', 'true');
+                document.getElementById('timerSiswa').classList.add('hidden');
+                checkSystemStatus();
+            } else {
+                document.getElementById('timerSiswa').classList.remove('hidden');
+                const m = Math.floor(diff / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('timeLeft').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            }
+        }, 1000);
+    }
+
+    // ABSENSI LOGIC
+    function takePic() {
+        const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.capture='user';
+        inp.onchange = e => {
+            const r = new FileReader();
+            r.onload = f => {
+                currentImg = f.target.result;
+                const p = document.getElementById('prev');
+                p.src = currentImg; p.style.display = 'block';
+                document.getElementById('btnKirim').classList.remove('hidden');
             };
-            reader.readAsDataURL(e.target.files[0]);
+            r.readAsDataURL(e.target.files[0]);
         };
-        fileIn.click();
+        inp.click();
     }
 
-    // PROSES SIMPAN REALTIME
-    function prosesAbsen() {
-        const nama = document.getElementById('inNama').value;
-        const kelas = document.getElementById('inKelas').value;
-        if(!nama) return showMsg("Nama wajib diisi!");
-
+    function saveAbsen() {
+        const n = document.getElementById('inNama').value;
+        const k = document.getElementById('inKelas').value;
         const d = new Date();
         const jam = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
-        const status = d.getHours() >= 8 ? "Terlambat" : "Hadir";
+        const status = (d.getHours() > 8 || (d.getHours() === 8 && d.getMinutes() > 0)) ? "Terlambat" : "Tepat Waktu";
 
-        const dataBaru = { n: nama, k: kelas, j: jam, s: status, p: photoStr };
-        let db = JSON.parse(localStorage.getItem('absensi_db_verona')) || [];
-        db.push(dataBaru);
-        
-        localStorage.setItem('absensi_db_verona', JSON.stringify(db));
-        showMsg("Berhasil Terkirim!");
-        
-        // Reset Form & Back
+        let db = JSON.parse(localStorage.getItem('db_sma_v6')) || [];
+        db.push({n, k, jam, status, foto:currentImg});
+        localStorage.setItem('db_sma_v6', JSON.stringify(db));
+
+        document.getElementById('succMsg').innerText = `Absensi atas nama ${n} berhasil dikirim pada jam ${jam}.`;
+        go('vSuccess');
+    }
+
+    function resetToHome() {
+        currentImg = "";
+        document.getElementById('prev').style.display = 'none';
         document.getElementById('inNama').value = "";
-        document.getElementById('preview').style.display = 'none';
-        document.getElementById('btnKirim').classList.add('hidden');
-        nav('pLive');
+        document.getElementById('inNIS').value = "";
+        go('vMain');
     }
 
-    function doLogin() {
-        if(document.getElementById('u').value === "deby verona" && 
-           document.getElementById('n').value === "vero" && 
-           document.getElementById('p').value === "patrobas") {
-            sessionStorage.setItem('is_auth', 'true');
-            nav('pDash');
-        } else { showMsg("Login Gagal!"); }
+    // GURU LOGIC
+    function authG() {
+        const e = document.getElementById('gE').value, n = document.getElementById('gN').value, p = document.getElementById('gP').value;
+        if(e === "deby verona" && n === "vero" && p === "patrobas") {
+            sessionStorage.setItem('isGuru', 'true');
+            go('vGuruDash');
+        } else { alert("Data Salah!"); }
     }
 
-    // RENDER DATA (RESPONSIF & TANPA DELAY)
-    function render() {
-        const db = JSON.parse(localStorage.getItem('absensi_db_verona')) || [];
-        const t1 = document.getElementById('listLive');
-        const t2 = document.getElementById('listDash');
-        
-        const html = db.length === 0 ? "<p style='text-align:center; padding:20px; color:#94a3b8; font-size:0.8rem;'>Belum ada data masuk.</p>" : 
-        [...db].reverse().map(x => `
-            <div class="item">
-                <img src="${x.p}">
-                <div class="info"><b>${x.n}</b><span>${x.k} • ${x.j} WIB</span></div>
-                <div class="badge ${x.s==='Hadir'?'bh':'bt'}">${x.s}</div>
-            </div>
-        `).join('');
-
-        if(t1) t1.innerHTML = html;
-        if(t2) t2.innerHTML = html;
+    function renderGuru() {
+        const db = JSON.parse(localStorage.getItem('db_sma_v6')) || [];
+        const body = document.getElementById('listG');
+        body.innerHTML = "";
+        db.forEach(s => {
+            body.innerHTML += `<tr><td>${s.n}</td><td>${s.jam}</td><td><span class="badge ${s.status === 'Terlambat'?'late':'ontime'}">${s.status}</span></td></tr>`;
+        });
     }
 
-    // AUTO UPDATE JIKA ADA DATA BARU DARI HP LAIN
-    window.addEventListener('storage', (e) => {
-        if(e.key === 'absensi_db_verona') render();
-    });
-
-    function doLogout() {
-        sessionStorage.clear();
-        localStorage.removeItem('current_pos');
-        location.reload();
-    }
-
-    // EXPORT FUNCTIONS
-    function expXL() {
-        const db = JSON.parse(localStorage.getItem('absensi_db_verona')) || [];
-        const ws = XLSX.utils.json_to_sheet(db.map(i=>({Nama:i.n, Kelas:i.k, Jam:i.j, Status:i.s})));
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Absen");
-        XLSX.writeFile(wb, "Data_Absensi_SMA.xlsx");
-    }
-
-    function expPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const db = JSON.parse(localStorage.getItem('absensi_db_verona')) || [];
-        doc.text("Laporan Absensi SMA Bahagia", 14, 15);
-        doc.autoTable({ head:[['Nama','Kelas','Jam','Status']], body:db.map(i=>[i.n,i.k,i.j,i.s]), startY:20 });
-        doc.save("Laporan_Absen.pdf");
-    }
+    function logout() { sessionStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
