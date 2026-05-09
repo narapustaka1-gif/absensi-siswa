@@ -3,9 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistem Absensi Digital</title>
+<title>Sistem Absensi Premium</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
+
 *{
     margin:0;
     padding:0;
@@ -15,22 +18,32 @@
 
 body{
     background:
-    linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),
-    url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1200');
+    linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.55)),
+    url('https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1400');
     background-size:cover;
     background-position:center;
     min-height:100vh;
     padding:20px;
+    transition:0.3s;
+}
+
+.dark-mode{
+    background:#111 !important;
 }
 
 .card{
     background:white;
-    max-width:500px;
-    margin:30px auto;
+    max-width:900px;
+    margin:20px auto;
     padding:25px;
     border-radius:25px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.25);
-    animation:fade 0.4s ease;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    animation:fade .4s ease;
+}
+
+.dark-mode .card{
+    background:#1e1e1e;
+    color:white;
 }
 
 .hidden{
@@ -40,7 +53,7 @@ body{
 @keyframes fade{
     from{
         opacity:0;
-        transform:translateY(20px);
+        transform:translateY(15px);
     }
     to{
         opacity:1;
@@ -48,25 +61,14 @@ body{
     }
 }
 
-h1,h2,h3{
-    margin-bottom:15px;
-}
-
-.subtitle{
-    color:#666;
-    margin-bottom:25px;
-}
-
 .btn{
-    width:100%;
-    padding:14px;
+    padding:12px;
     border:none;
-    border-radius:14px;
+    border-radius:12px;
     cursor:pointer;
     font-weight:bold;
     margin-top:10px;
-    transition:0.3s;
-    font-size:15px;
+    transition:.3s;
 }
 
 .btn:hover{
@@ -83,20 +85,23 @@ h1,h2,h3{
     color:white;
 }
 
-.btn-outline{
-    background:white;
-    border:2px solid #1a73e8;
-    color:#1a73e8;
+.btn-red{
+    background:#dc2626;
+    color:white;
+}
+
+.btn-dark{
+    background:#222;
+    color:white;
 }
 
 input,select{
     width:100%;
-    padding:13px;
-    margin-top:8px;
-    margin-bottom:15px;
-    border:1px solid #ddd;
+    padding:12px;
     border-radius:12px;
-    font-size:14px;
+    border:1px solid #ddd;
+    margin-top:7px;
+    margin-bottom:15px;
 }
 
 table{
@@ -113,15 +118,8 @@ th{
 th,td{
     padding:12px;
     border-bottom:1px solid #eee;
-    text-align:left;
     font-size:13px;
-}
-
-.img-preview{
-    width:45px;
-    height:45px;
-    border-radius:10px;
-    object-fit:cover;
+    text-align:left;
 }
 
 .preview{
@@ -131,182 +129,206 @@ th,td{
     display:none;
 }
 
-.header{
-    text-align:center;
-    margin-bottom:20px;
+.img-preview{
+    width:45px;
+    height:45px;
+    border-radius:10px;
+    object-fit:cover;
 }
 
-.header img{
-    width:80px;
-    margin-bottom:10px;
+.topbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:15px;
 }
 
 .badge{
     background:#e8f0fe;
     color:#1a73e8;
-    padding:8px 12px;
-    border-radius:999px;
     display:inline-block;
-    font-size:12px;
-    margin-bottom:10px;
+    padding:8px 15px;
+    border-radius:999px;
+    margin-bottom:15px;
+    font-size:13px;
 }
 
-.total-box{
-    background:#f5f7ff;
-    padding:15px;
-    border-radius:15px;
-    margin-bottom:20px;
+.qr{
     text-align:center;
-}
-
-.kembali{
     margin-top:15px;
-    background:none;
-    border:none;
-    color:#1a73e8;
-    cursor:pointer;
 }
 
-@media(max-width:600px){
-    .card{
-        padding:20px;
-    }
+@media(max-width:700px){
 
     table{
         font-size:11px;
     }
+
+    .topbar{
+        flex-direction:column;
+    }
+
 }
+
 </style>
 </head>
 
 <body>
 
-<!-- HALAMAN PILIH ROLE -->
+<!-- PILIH ROLE -->
 <div id="roleSelection" class="card">
 
-    <div class="header">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png">
-        <h1>Sistem Absensi</h1>
-        <p class="subtitle">Absensi Digital Sekolah</p>
-    </div>
+<h1>Sistem Absensi Premium</h1>
+<p style="margin:15px 0;color:gray;">
+Absensi Digital Sekolah Modern
+</p>
 
-    <button class="btn btn-blue" onclick="showView('viewSiswa')">
-        Masuk sebagai Siswa
-    </button>
+<button class="btn btn-blue" style="width:100%;" onclick="showView('viewSiswa')">
+Masuk Sebagai Siswa
+</button>
 
-    <button class="btn btn-outline" onclick="showView('viewGuruLogin')">
-        Masuk sebagai Guru
-    </button>
+<button class="btn btn-dark" style="width:100%;" onclick="showView('viewGuruLogin')">
+Masuk Sebagai Guru
+</button>
+
+<button class="btn btn-green" style="width:100%;" onclick="toggleDarkMode()">
+🌙 Dark Mode
+</button>
 
 </div>
 
 <!-- LOGIN SISWA -->
 <div id="viewSiswa" class="card hidden">
 
-    <h2>Login Siswa</h2>
+<h2>Login Siswa</h2>
 
-    <input type="text" placeholder="NIS / Username">
-    <input type="password" placeholder="Password">
+<input type="text" placeholder="NIS / Username">
 
-    <button class="btn btn-blue" onclick="showView('viewFormSiswa')">
-        Login
-    </button>
+<input type="password" placeholder="Password">
 
-    <button class="kembali" onclick="showView('roleSelection')">
-        ← Kembali
-    </button>
+<button class="btn btn-blue" style="width:100%;" onclick="showView('viewFormSiswa')">
+Login
+</button>
 
 </div>
 
 <!-- LOGIN GURU -->
 <div id="viewGuruLogin" class="card hidden">
 
-    <h2>Login Guru</h2>
+<h2>Login Guru</h2>
 
-    <input type="text" id="guruUser" placeholder="Username Guru">
-    <input type="password" id="guruPass" placeholder="Password">
+<input type="text" id="guruUser" placeholder="Username">
 
-    <button class="btn btn-blue" onclick="loginGuru()">
-        Login Guru
-    </button>
+<input type="password" id="guruPass" placeholder="Password">
 
-    <button class="kembali" onclick="showView('roleSelection')">
-        ← Kembali
-    </button>
+<button class="btn btn-blue" style="width:100%;" onclick="loginGuru()">
+Login Guru
+</button>
 
 </div>
 
 <!-- FORM ABSENSI -->
 <div id="viewFormSiswa" class="card hidden">
 
-    <div class="badge">
-        Absensi Hari Ini
-    </div>
+<div class="badge">
+📅 <span id="tanggal"></span>
+</div>
 
-    <h2>Isi Kehadiran</h2>
+<h2>Form Kehadiran</h2>
 
-    <label>Nama Lengkap</label>
-    <input type="text" id="namaSiswa">
+<label>Nama</label>
+<input type="text" id="namaSiswa">
 
-    <label>Kelas</label>
-    <select id="kelasSiswa">
-        <option>X - Multimedia</option>
-        <option>XI - RPL</option>
-        <option>XII - TKJ</option>
-    </select>
+<label>Kelas</label>
+<select id="kelasSiswa">
+<option>X Multimedia</option>
+<option>XI RPL</option>
+<option>XII TKJ</option>
+</select>
 
-    <label>Status Kehadiran</label>
-    <select id="ketSiswa">
-        <option>Tepat Waktu</option>
-        <option>Terlambat</option>
-    </select>
+<label>Status</label>
+<select id="ketSiswa">
+<option>Hadir</option>
+<option>Izin</option>
+<option>Sakit</option>
+<option>Alfa</option>
+<option>Terlambat</option>
+</select>
 
-    <button class="btn btn-outline" onclick="ambilFoto()">
-        📸 Ambil Foto Selfie
-    </button>
+<button class="btn btn-dark" style="width:100%;" onclick="ambilFoto()">
+📸 Selfie
+</button>
 
-    <img id="previewImg" class="preview">
+<img id="previewImg" class="preview">
 
-    <button id="btnKirim" class="btn btn-green hidden" onclick="kirimAbsen()">
-        Kirim Absensi
-    </button>
+<div class="qr">
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=ABSENSI-SEKOLAH"
+width="140">
+<p style="margin-top:10px;font-size:12px;">
+QR Absensi Sekolah
+</p>
+</div>
+
+<button id="btnKirim" class="btn btn-green hidden" style="width:100%;" onclick="kirimAbsen()">
+Kirim Absensi
+</button>
 
 </div>
 
 <!-- DASHBOARD GURU -->
-<div id="viewGuru" class="card hidden" style="max-width:700px;">
+<div id="viewGuru" class="card hidden">
 
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-        <h2>Dashboard Guru</h2>
+<div style="display:flex;justify-content:space-between;align-items:center;">
+<h2>Dashboard Guru</h2>
 
-        <button onclick="showView('roleSelection')" style="padding:8px 12px;">
-            Keluar
-        </button>
-    </div>
+<button class="btn btn-red" onclick="showView('roleSelection')">
+Keluar
+</button>
+</div>
 
-    <div class="total-box">
-        <h3 id="totalSiswa">0</h3>
-        <p>Total Kehadiran Hari Ini</p>
-    </div>
+<div class="topbar">
 
-    <table id="tabelGuru">
+<input type="text" id="searchInput" placeholder="🔍 Cari siswa..." onkeyup="renderTabel()">
 
-        <thead>
-            <tr>
-                <th>Foto</th>
-                <th>Nama</th>
-                <th>Jam</th>
-                <th>Status</th>
-            </tr>
-        </thead>
+<select id="filterKelas" onchange="renderTabel()">
+<option value="">Semua Kelas</option>
+<option>X Multimedia</option>
+<option>XI RPL</option>
+<option>XII TKJ</option>
+</select>
 
-        <tbody></tbody>
+<button class="btn btn-green" onclick="exportExcel()">
+Export Excel
+</button>
 
-    </table>
+<button class="btn btn-dark" onclick="toggleDarkMode()">
+Dark Mode
+</button>
 
-    <button class="btn btn-blue" onclick="hapusSemuaData()">
-        Reset Semua Data
-    </button>
+</div>
+
+<h3 id="rekapBulanan"></h3>
+
+<table id="tabelGuru">
+
+<thead>
+<tr>
+<th>Foto</th>
+<th>Nama</th>
+<th>Kelas</th>
+<th>Tanggal</th>
+<th>Jam</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+<button class="btn btn-red" style="width:100%;" onclick="hapusSemuaData()">
+Reset Semua Data
+</button>
 
 </div>
 
@@ -314,132 +336,205 @@ th,td{
 
 let fotoData = "";
 
-function showView(viewId){
+document.getElementById('tanggal').innerText =
+new Date().toLocaleDateString('id-ID',{
+weekday:'long',
+year:'numeric',
+month:'long',
+day:'numeric'
+});
 
-    document.querySelectorAll('.card').forEach(card=>{
-        card.classList.add('hidden');
-    });
+function showView(id){
 
-    document.getElementById(viewId).classList.remove('hidden');
+document.querySelectorAll('.card').forEach(card=>{
+card.classList.add('hidden');
+});
 
-    if(viewId === 'viewGuru'){
-        renderTabel();
-    }
+document.getElementById(id).classList.remove('hidden');
+
+if(id === 'viewGuru'){
+renderTabel();
+}
+
 }
 
 function loginGuru(){
 
-    const user = document.getElementById('guruUser').value;
-    const pass = document.getElementById('guruPass').value;
+const user = document.getElementById('guruUser').value;
+const pass = document.getElementById('guruPass').value;
 
-    if(user === "guru" && pass === "123"){
-        showView('viewGuru');
-    }else{
-        alert("Username atau password salah!");
-    }
+const encrypted = btoa(pass);
+
+if(user === "guru" && encrypted === btoa("123")){
+
+showView('viewGuru');
+
+}else{
+
+alert("Login gagal!");
+
+}
+
 }
 
 function ambilFoto(){
 
-    const input = document.createElement('input');
+const input = document.createElement('input');
 
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'user';
+input.type = 'file';
+input.accept = 'image/*';
+input.capture = 'user';
 
-    input.onchange = e => {
+input.onchange = e=>{
 
-        const reader = new FileReader();
+const reader = new FileReader();
 
-        reader.onload = f => {
+reader.onload = f=>{
 
-            fotoData = f.target.result;
+fotoData = f.target.result;
 
-            document.getElementById('previewImg').src = fotoData;
-            document.getElementById('previewImg').style.display = 'block';
+document.getElementById('previewImg').src = fotoData;
 
-            document.getElementById('btnKirim').classList.remove('hidden');
-        };
+document.getElementById('previewImg').style.display = 'block';
 
-        reader.readAsDataURL(e.target.files[0]);
-    };
+document.getElementById('btnKirim').classList.remove('hidden');
 
-    input.click();
+};
+
+reader.readAsDataURL(e.target.files[0]);
+
+};
+
+input.click();
+
 }
 
 function kirimAbsen(){
 
-    const nama = document.getElementById('namaSiswa').value;
-    const kelas = document.getElementById('kelasSiswa').value;
-    const ket = document.getElementById('ketSiswa').value;
+const nama = document.getElementById('namaSiswa').value;
 
-    const jam = new Date().toLocaleTimeString('id-ID',{
-        hour:'2-digit',
-        minute:'2-digit'
-    });
+const kelas = document.getElementById('kelasSiswa').value;
 
-    if(!nama){
-        alert("Nama harus diisi!");
-        return;
-    }
+const ket = document.getElementById('ketSiswa').value;
 
-    let db = JSON.parse(localStorage.getItem('db_absen')) || [];
+const jam = new Date().toLocaleTimeString('id-ID',{
+hour:'2-digit',
+minute:'2-digit'
+});
 
-    db.push({
-        nama,
-        kelas,
-        ket,
-        jam,
-        foto:fotoData
-    });
+const tanggal = new Date().toLocaleDateString('id-ID');
 
-    localStorage.setItem('db_absen',JSON.stringify(db));
+if(!nama){
 
-    alert("Absensi berhasil!");
+alert("Isi nama dulu!");
 
-    location.reload();
+return;
+
+}
+
+let db = JSON.parse(localStorage.getItem('db_absen')) || [];
+
+db.push({
+nama,
+kelas,
+ket,
+jam,
+tanggal,
+foto:fotoData
+});
+
+localStorage.setItem('db_absen',JSON.stringify(db));
+
+alert("Absensi berhasil!");
+
+location.reload();
+
 }
 
 function renderTabel(){
 
-    const db = JSON.parse(localStorage.getItem('db_absen')) || [];
+const db = JSON.parse(localStorage.getItem('db_absen')) || [];
 
-    const tbody = document.querySelector('#tabelGuru tbody');
+const tbody = document.querySelector('#tabelGuru tbody');
 
-    tbody.innerHTML = "";
+tbody.innerHTML = "";
 
-    document.getElementById('totalSiswa').innerText = db.length;
+const search = document.getElementById('searchInput').value.toLowerCase();
 
-    db.forEach(s=>{
+const filter = document.getElementById('filterKelas').value;
 
-        tbody.innerHTML += `
-        <tr>
-            <td>
-                <img src="${s.foto}" class="img-preview">
-            </td>
+let totalBulanan = 0;
 
-            <td>
-                ${s.nama}
-                <br>
-                <small>${s.kelas}</small>
-            </td>
+db.forEach(s=>{
 
-            <td>${s.jam}</td>
+if(
+s.nama.toLowerCase().includes(search) &&
+(filter === "" || s.kelas === filter)
+){
 
-            <td>${s.ket}</td>
-        </tr>
-        `;
-    });
+totalBulanan++;
+
+tbody.innerHTML += `
+
+<tr>
+
+<td>
+<img src="${s.foto}" class="img-preview">
+</td>
+
+<td>${s.nama}</td>
+
+<td>${s.kelas}</td>
+
+<td>${s.tanggal}</td>
+
+<td>${s.jam}</td>
+
+<td>${s.ket}</td>
+
+</tr>
+
+`;
+
+}
+
+});
+
+document.getElementById('rekapBulanan').innerHTML =
+"📊 Rekap Data: " + totalBulanan + " siswa";
+
+}
+
+function exportExcel(){
+
+const db = JSON.parse(localStorage.getItem('db_absen')) || [];
+
+const ws = XLSX.utils.json_to_sheet(db);
+
+const wb = XLSX.utils.book_new();
+
+XLSX.utils.book_append_sheet(wb,ws,"Absensi");
+
+XLSX.writeFile(wb,"Data_Absensi.xlsx");
+
 }
 
 function hapusSemuaData(){
 
-    if(confirm("Yakin ingin menghapus semua data?")){
+if(confirm("Hapus semua data absensi?")){
 
-        localStorage.removeItem('db_absen');
+localStorage.removeItem('db_absen');
 
-        renderTabel();
-    }
+renderTabel();
+
+}
+
+}
+
+function toggleDarkMode(){
+
+document.body.classList.toggle('dark-mode');
+
 }
 
 </script>
