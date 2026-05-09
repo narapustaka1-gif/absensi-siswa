@@ -3,250 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Pro - Integrated</title>
+    <title>Absensi - SMA Bahagia Indonesia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4361ee;
-            --success: #2ec4b6;
-            --danger: #e71d36;
-            --dark: #2b2d42;
-            --light: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.95);
+            --primary: #4f46e5;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: #f0f2f5; color: var(--dark); line-height: 1.6; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { 
+            background: var(--bg); 
+            min-height: 100vh; 
+            display: flex; align-items: center; justify-content: center; 
+            padding: 20px; color: #1e293b;
+        }
+
+        .container { width: 100%; max-width: 480px; }
+
+        /* Branding Sekolah */
+        .school-header { text-align: center; margin-bottom: 25px; color: white; }
+        .school-header h1 { font-size: 1.2rem; letter-spacing: 2px; font-weight: 300; opacity: 0.9; }
+        .school-header p { font-weight: 800; font-size: 1.5rem; color: #f8fafc; }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 35px;
+            padding: 45px 35px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.7s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .hidden { display: none; }
+        
+        .title { text-align: center; font-weight: 800; font-size: 1.8rem; margin-bottom: 8px; background: linear-gradient(to right, #4f46e5, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { text-align: center; font-size: 0.9rem; color: #64748b; margin-bottom: 35px; }
 
-        /* Card Styles */
-        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.05); }
-        .title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: var(--primary); text-align: center; }
+        /* Input Luxury */
+        .input-group { margin-bottom: 22px; }
+        label { display: block; font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; color: #475569; text-transform: uppercase; letter-spacing: 1px; }
+        input, select {
+            width: 100%; padding: 16px 20px; border: 2px solid #f1f5f9; border-radius: 18px;
+            font-size: 1rem; outline: none; transition: 0.4s; background: #f8fafc;
+        }
+        input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 5px rgba(79, 70, 229, 0.1); }
 
-        /* Form Styles */
-        input, select { width: 100%; padding: 12px 15px; margin: 10px 0 20px; border: 2px solid #edf2f4; border-radius: 12px; font-size: 1rem; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); }
-        label { font-weight: 700; font-size: 0.85rem; color: #666; }
+        /* Button Luxury */
+        .btn {
+            width: 100%; padding: 18px; border: none; border-radius: 18px;
+            font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        .btn-primary { background: linear-gradient(135deg, #4f46e5 0%, #8b5cf6 100%); color: white; box-shadow: 0 12px 20px -5px rgba(79, 70, 229, 0.4); }
+        .btn-primary:hover { transform: scale(1.02); box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.5); }
+        .btn-camera { background: #ffffff; color: #1e293b; border: 2px solid #e2e8f0; margin-bottom: 20px; }
+        
+        /* Dashboard Stats */
+        .stats { display: flex; gap: 10px; margin-bottom: 25px; }
+        .stat-card { flex: 1; background: white; padding: 15px; border-radius: 20px; text-align: center; border: 1px solid #f1f5f9; }
+        .stat-card small { display: block; font-size: 0.65rem; font-weight: 700; color: #94a3b8; }
+        .stat-card b { font-size: 1.3rem; color: var(--primary); }
 
-        /* Button Styles */
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-danger { background: var(--danger); color: white; }
+        .table-container { background: white; border-radius: 22px; overflow: hidden; border: 1px solid #f1f5f9; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 15px; font-size: 0.75rem; text-align: left; color: #64748b; }
+        td { padding: 15px; border-top: 1px solid #f1f5f9; font-size: 0.85rem; }
+        .avatar { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; }
 
-        /* Status Badges */
-        .badge { padding: 5px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
-        .bg-danger { background: #ffe5e5; color: var(--danger); }
-        .bg-success { background: #e7fbf3; color: var(--success); }
+        .badge { padding: 5px 12px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; }
+        .late { background: #fff1f2; color: var(--danger); }
+        .ontime { background: #ecfdf5; color: var(--success); }
 
-        /* Guru Dashboard specific */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: white; padding: 15px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--primary); }
-        .table-wrapper { overflow-x: auto; background: white; border-radius: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 0.8rem; color: #888; }
-        td { padding: 15px; border-bottom: 1px solid #f1f1f1; font-size: 0.9rem; cursor: pointer; }
-        .img-table { width: 45px; height: 45px; border-radius: 10px; object-fit: cover; }
-
-        /* Modal */
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:1000; padding: 20px; }
-        .modal-content { background:white; width:100%; max-width:400px; border-radius:25px; overflow:hidden; position:relative; }
+        /* Success State */
+        .check-icon { font-size: 60px; color: var(--success); margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    
-    <!-- 1. ROLE SELECTION -->
-    <div id="viewRole" class="card">
-        <h1 class="title">Sistem Absensi v4.0</h1>
-        <p style="text-align:center; color:#666; margin-bottom:30px;">Silakan pilih akses masuk:</p>
-        <button class="btn btn-primary" onclick="showView('viewSiswa')" style="margin-bottom:15px;">Portal Siswa</button>
-        <button class="btn btn-outline" onclick="showView('viewLoginGuru')">Dashboard Guru (Private)</button>
+    <div class="school-header">
+        <h1>SISTEM ABSENSI</h1>
+        <p>SMA Bahagia Indonesia</p>
     </div>
 
-    <!-- 2. LOGIN GURU (PRIVATE) -->
-    <div id="viewLoginGuru" class="card hidden">
-        <h2 class="title">Verifikasi Admin</h2>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="text" id="logEmail" placeholder="">
-            <label>Nama</label>
-            <input type="text" id="logNama" placeholder="">
-            <label>Kata Sandi</label>
-            <input type="password" id="logPass" placeholder="">
-        </div>
-        <button class="btn btn-primary" onclick="authGuru()">Masuk Dashboard</button>
-        <button onclick="showView('viewRole')" style="margin-top:15px; background:none; border:none; color:gray; cursor:pointer; width:100%;">Kembali</button>
+    <!-- TAMPILAN 1: PILIH AKSES -->
+    <div id="viewMain" class="card">
+        <h2 class="title">Selamat Datang</h2>
+        <p class="subtitle">Silakan pilih akses portal Anda</p>
+        <button class="btn btn-primary" onclick="nav('viewSiswaLogin')" style="margin-bottom:15px;">Portal Siswa</button>
+        <button class="btn btn-camera" onclick="nav('viewGuruLogin')" style="border-style: solid;">Dashboard Guru</button>
     </div>
 
-    <!-- 3. VIEW SISWA -->
-    <div id="viewSiswa" class="card hidden">
-        <h2 class="title">Absensi Siswa</h2>
-        <div style="background:#f0f4ff; padding:10px; border-radius:10px; font-size:0.8rem; margin-bottom:15px; text-align:center;">
-            Batas Tepat Waktu: <strong>08:00 WIB</strong>
+    <!-- TAMPILAN 2: SISWA LOGIN (NIS) -->
+    <div id="viewSiswaLogin" class="card hidden">
+        <h2 class="title">Masuk Siswa</h2>
+        <p class="subtitle">Gunakan Nomor Induk Siswa (NIS)</p>
+        <div class="input-group">
+            <label>Nomor Induk Siswa</label>
+            <input type="number" id="nis" placeholder="Masukkan NIS">
         </div>
-        <input type="text" id="inNama" placeholder="Nama Lengkap">
-        <select id="inKelas">
-            <option>X - RPL</option>
-            <option>XI - TKJ</option>
-            <option>XII - Multimedia</option>
-        </select>
-        <button class="btn btn-outline" onclick="openCamera()">📸 Ambil Selfie</button>
-        <img id="previewFoto" style="width:100%; border-radius:15px; margin: 15px 0; display:none;">
-        <button id="btnSubmit" class="btn btn-primary hidden" onclick="prosesAbsenSiswa()">Kirim Absen</button>
-        <button onclick="showView('viewRole')" style="margin-top:10px; border:none; background:none; color:gray; cursor:pointer; width:100%;">Batal</button>
+        <button class="btn btn-primary" onclick="prosesNIS()">Lanjutkan</button>
+        <p onclick="nav('viewMain')" style="text-align:center; margin-top:25px; cursor:pointer; font-size:0.8rem; color:#94a3b8;">Kembali</p>
     </div>
 
-    <!-- 4. DASHBOARD GURU -->
-    <div id="viewGuru" class="card hidden" style="max-width: 900px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="color:var(--primary)">Panel Guru</h2>
-            <button onclick="logoutGuru()" class="badge bg-danger" style="border:none; cursor:pointer;">Logout</button>
+    <!-- TAMPILAN 3: DATA LENGKAP SISWA -->
+    <div id="viewSiswaForm" class="card hidden">
+        <h2 class="title">Data Diri</h2>
+        <p class="subtitle">Lengkapi sebelum jam 08:00 WIB</p>
+        <div class="input-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="nama" placeholder="Nama Sesuai Absen">
         </div>
-
-        <div class="stats-grid">
-            <div class="stat-box"><h3>Total</h3><p id="sTotal">0</p></div>
-            <div class="stat-box" style="border-color:var(--success)"><h3>Tepat</h3><p id="sTepat" style="color:var(--success)">0</p></div>
-            <div class="stat-box" style="border-color:var(--danger)"><h3>Lambat</h3><p id="sLambat" style="color:var(--danger)">0</p></div>
+        <div class="input-group">
+            <label>Kelas</label>
+            <select id="kelas">
+                <option>X - Bahagia 1</option>
+                <option>XI - Bahagia 2</option>
+                <option>XII - Bahagia 3</option>
+            </select>
         </div>
+        <button class="btn btn-camera" onclick="pickPhoto()">📸 Klik Untuk Selfie</button>
+        <img id="prev" style="width:100%; border-radius:20px; margin-bottom:20px; display:none;">
+        <button id="btnKirim" class="btn btn-primary hidden" onclick="submitAbsen()">Kirim Kehadiran</button>
+    </div>
 
-        <div class="table-wrapper">
+    <!-- TAMPILAN 4: HASIL & KUNCI -->
+    <div id="viewLocked" class="card hidden" style="text-align:center;">
+        <div class="check-icon">✦</div>
+        <h2 style="color:var(--success)">Selesai!</h2>
+        <p id="msgLock" style="margin:20px 0; font-weight:600; color:#475569;"></p>
+        <div style="background:#f8fafc; padding:20px; border-radius:22px; text-align:left; border:1px dashed #e2e8f0;">
+            <p style="font-size:0.8rem; color:#94a3b8;">Waktu Masuk: <span id="resTime" style="color:#1e293b; font-weight:800;"></span></p>
+            <p style="font-size:0.8rem; color:#94a3b8;">Status: <span id="resStatus" class="badge"></span></p>
+        </div>
+        <p style="margin-top:35px; color:var(--danger); font-size:0.7rem; font-weight:800; letter-spacing:2px;">SISTEM TERKUNCI OTOMATIS</p>
+    </div>
+
+    <!-- GURU LOGIN -->
+    <div id="viewGuruLogin" class="card hidden">
+        <h2 class="title">Admin Login</h2>
+        <p class="subtitle">Akses Dashboard SMA Bahagia Indonesia</p>
+        <div class="input-group"><input type="text" id="gEmail" placeholder="Email"></div>
+        <div class="input-group"><input type="text" id="gNama" placeholder="Nama"></div>
+        <div class="input-group"><input type="password" id="gPass" placeholder="Kata Sandi"></div>
+        <button class="btn btn-primary" onclick="authGuru()">Buka Dashboard</button>
+    </div>
+
+    <!-- GURU DASHBOARD -->
+    <div id="viewGuruDash" class="card hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <h3 style="font-weight:800;">Monitoring</h3>
+            <button onclick="logout()" class="badge late" style="border:none; cursor:pointer;">Keluar</button>
+        </div>
+        <div class="stats">
+            <div class="stat-card"><small>Total</small><b id="sT">0</b></div>
+            <div class="stat-card"><small>Tepat</small><b id="sH" style="color:var(--success)">0</b></div>
+            <div class="stat-card"><small>Telat</small><b id="sL" style="color:var(--danger)">0</b></div>
+        </div>
+        <div class="table-container">
             <table>
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Siswa</th>
-                        <th>Jam</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyTabelGuru"></tbody>
+                <thead><tr><th>Siswa</th><th>Waktu</th><th>Ket</th></tr></thead>
+                <tbody id="list"></tbody>
             </table>
-        </div>
-    </div>
-
-    <!-- MODAL DETAIL -->
-    <div id="modalDetail" class="modal" onclick="this.style.display='none'">
-        <div class="modal-content" onclick="event.stopPropagation()" style="padding:20px;">
-            <img id="detailFoto" style="width:100%; border-radius:15px; margin-bottom:15px;">
-            <h3 id="detailNama"></h3>
-            <p id="detailKelas"></p>
-            <p id="detailWaktu"></p>
-            <span id="detailBadge" class="badge"></span>
         </div>
     </div>
 
 </div>
 
 <script>
-    let photoBase64 = "";
+    let photo = "";
 
-    // CEK SESSION SAAT REFRESH
     window.onload = () => {
-        const session = sessionStorage.getItem('guruLogin');
-        if (session === 'true') {
-            showView('viewGuru');
+        if(localStorage.getItem('isLocked')) {
+            renderLock();
+            nav('viewLocked');
+        } else if(sessionStorage.getItem('isGuru')) {
+            nav('viewGuruDash');
         } else {
-            showView('viewRole');
+            const savedView = sessionStorage.getItem('lastView');
+            if(savedView) nav(savedView);
         }
     };
 
-    function showView(id) {
+    function nav(id) {
         document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
-        if(id === 'viewGuru') renderTabelGuru();
+        if(id !== 'viewLocked' && id !== 'viewGuruDash') sessionStorage.setItem('lastView', id);
+        if(id === 'viewGuruDash') renderGuru();
     }
 
-    // AUTH GURU (RAHASIA)
+    function prosesNIS() {
+        if(document.getElementById('nis').value) nav('viewSiswaForm');
+    }
+
+    function pickPhoto() {
+        const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.capture='user';
+        i.onchange = e => {
+            const r = new FileReader();
+            r.onload = f => {
+                photo = f.target.result;
+                document.getElementById('prev').src = photo;
+                document.getElementById('prev').style.display = 'block';
+                document.getElementById('btnKirim').classList.remove('hidden');
+            };
+            r.readAsDataURL(e.target.files[0]);
+        };
+        i.click();
+    }
+
+    function submitAbsen() {
+        const n = document.getElementById('nama').value;
+        const k = document.getElementById('kelas').value;
+        if(!n) return alert("Isi nama kamu!");
+
+        const d = new Date();
+        const time = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+        const status = (d.getHours() > 8 || (d.getHours() === 8 && d.getMinutes() > 0)) ? "Terlambat" : "Tepat Waktu";
+
+        let db = JSON.parse(localStorage.getItem('school_db')) || [];
+        db.push({nama:n, kelas:k, jam:time, status:status, foto:photo});
+        localStorage.setItem('school_db', JSON.stringify(db));
+
+        localStorage.setItem('isLocked', 'true');
+        localStorage.setItem('lNama', n);
+        localStorage.setItem('lJam', time);
+        localStorage.setItem('lKet', status);
+
+        renderLock();
+        nav('viewLocked');
+    }
+
+    function renderLock() {
+        document.getElementById('msgLock').innerText = `Terima kasih ${localStorage.getItem('lNama')}, data absen kamu sudah terkirim.`;
+        document.getElementById('resTime').innerText = localStorage.getItem('lJam');
+        const st = document.getElementById('resStatus');
+        st.innerText = localStorage.getItem('lKet');
+        st.className = "badge " + (localStorage.getItem('lKet') === "Terlambat" ? "late" : "ontime");
+    }
+
     function authGuru() {
-        const e = document.getElementById('logEmail').value;
-        const n = document.getElementById('logNama').value;
-        const p = document.getElementById('logPass').value;
-
-        // Kode rahasia sesuai permintaan
-        if(e === "deby verona" && n === "vero" && p === "patrobas") {
-            sessionStorage.setItem('guruLogin', 'true');
-            showView('viewGuru');
-        } else {
-            alert("Akses Ditolak! Kode Verifikasi Salah.");
-        }
+        if(document.getElementById('gEmail').value === "deby verona" && 
+           document.getElementById('gNama').value === "vero" && 
+           document.getElementById('gPass').value === "patrobas") {
+            sessionStorage.setItem('isGuru', 'true');
+            nav('viewGuruDash');
+        } else { alert("Data Salah!"); }
     }
 
-    function logoutGuru() {
+    function renderGuru() {
+        const db = JSON.parse(localStorage.getItem('school_db')) || [];
+        const body = document.getElementById('list');
+        body.innerHTML = "";
+        let t=0, l=0;
+        db.forEach(s => {
+            const isL = s.status === "Terlambat";
+            if(isL) l++; else t++;
+            body.innerHTML += `<tr>
+                <td><div style="display:flex; gap:10px; align-items:center;">
+                    <img src="${s.foto}" class="avatar">
+                    <div><b>${s.nama}</b><br><small>${s.kelas}</small></div>
+                </div></td>
+                <td>${s.jam}</td>
+                <td><span class="badge ${isL?'late':'ontime'}">${s.status}</span></td>
+            </tr>`;
+        });
+        document.getElementById('sT').innerText = db.length;
+        document.getElementById('sH').innerText = t;
+        document.getElementById('sL').innerText = l;
+    }
+
+    function logout() {
         sessionStorage.clear();
         location.reload();
-    }
-
-    // LOGIKA KAMERA & ABSEN
-    function openCamera() {
-        const input = document.createElement('input');
-        input.type = 'file'; input.accept = 'image/*'; input.capture = 'user';
-        input.onchange = e => {
-            const reader = new FileReader();
-            reader.onload = f => {
-                photoBase64 = f.target.result;
-                document.getElementById('previewFoto').src = photoBase64;
-                document.getElementById('previewFoto').style.display = 'block';
-                document.getElementById('btnSubmit').classList.remove('hidden');
-            }
-            reader.readAsDataURL(e.target.files[0]);
-        };
-        input.click();
-    }
-
-    function prosesAbsenSiswa() {
-        const nama = document.getElementById('inNama').value;
-        const kelas = document.getElementById('inKelas').value;
-        if(!nama || !photoBase64) return alert("Lengkapi data dan foto!");
-
-        const skrg = new Date();
-        const jam = skrg.getHours();
-        const mnt = skrg.getMinutes();
-        const waktuStr = jam.toString().padStart(2, '0') + ":" + mnt.toString().padStart(2, '0');
-        
-        let status = (jam > 8 || (jam === 8 && mnt > 0)) ? "Terlambat" : "Tepat Waktu";
-
-        const db = JSON.parse(localStorage.getItem('db_sekolah')) || [];
-        db.push({ nama, kelas, jam: waktuStr, status, foto: photoBase64 });
-        localStorage.setItem('db_sekolah', JSON.stringify(db));
-
-        alert(`Absen berhasil dikirim sebagai ${status}!`);
-        location.reload();
-    }
-
-    function renderTabelGuru() {
-        const db = JSON.parse(localStorage.getItem('db_sekolah')) || [];
-        const tbody = document.getElementById('bodyTabelGuru');
-        tbody.innerHTML = "";
-        let tL = 0, tT = 0;
-
-        db.forEach((s, i) => {
-            if(s.status === "Terlambat") tL++; else tT++;
-            const badge = s.status === "Terlambat" ? 'bg-danger' : 'bg-success';
-            tbody.innerHTML += `
-                <tr onclick="openModal(${i})">
-                    <td><img src="${s.foto}" class="img-table"></td>
-                    <td><strong>${s.nama}</strong><br><small>${s.kelas}</small></td>
-                    <td>${s.jam}</td>
-                    <td><span class="badge ${badge}">${s.status}</span></td>
-                </tr>
-            `;
-        });
-        document.getElementById('sTotal').innerText = db.length;
-        document.getElementById('sTepat').innerText = tT;
-        document.getElementById('sLambat').innerText = tL;
-    }
-
-    function openModal(i) {
-        const data = JSON.parse(localStorage.getItem('db_sekolah'))[i];
-        document.getElementById('detailFoto').src = data.foto;
-        document.getElementById('detailNama').innerText = data.nama;
-        document.getElementById('detailKelas').innerText = data.kelas;
-        document.getElementById('detailWaktu').innerText = "Absen pukul: " + data.jam;
-        const b = document.getElementById('detailBadge');
-        b.innerText = data.status;
-        b.className = "badge " + (data.status === "Terlambat" ? "bg-danger" : "bg-success");
-        document.getElementById('modalDetail').style.display = 'flex';
     }
 </script>
 </body>
