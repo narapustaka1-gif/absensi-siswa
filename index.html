@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Absensi Pro v3.0</title>
+    <title>Absensi Pro - Integrated</title>
     <style>
         :root {
             --primary: #4361ee;
             --success: #2ec4b6;
             --danger: #e71d36;
-            --warning: #ff9f1c;
             --dark: #2b2d42;
             --light: #f8f9fa;
         }
@@ -42,20 +41,15 @@
         /* Guru Dashboard specific */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-box { background: white; padding: 15px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--primary); }
-        .search-box { position: relative; margin-bottom: 20px; }
         .table-wrapper { overflow-x: auto; background: white; border-radius: 15px; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 0.8rem; color: #888; }
         td { padding: 15px; border-bottom: 1px solid #f1f1f1; font-size: 0.9rem; cursor: pointer; }
-        tr:hover td { background: #fcfcfc; }
         .img-table { width: 45px; height: 45px; border-radius: 10px; object-fit: cover; }
 
-        /* Modal Profile */
+        /* Modal */
         .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:1000; padding: 20px; }
         .modal-content { background:white; width:100%; max-width:400px; border-radius:25px; overflow:hidden; position:relative; }
-        .modal-close { position:absolute; top:15px; right:15px; background:white; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        
-        .timer-info { background: #f0f4ff; padding: 10px; border-radius: 10px; font-size: 0.8rem; margin-bottom: 15px; text-align: center; }
     </style>
 </head>
 <body>
@@ -64,53 +58,56 @@
     
     <!-- 1. ROLE SELECTION -->
     <div id="viewRole" class="card">
-        <div style="font-size: 50px; text-align: center; margin-bottom: 10px;">🏫</div>
-        <h1 class="title">Absensi Digital</h1>
-        <p style="text-align:center; color:#666; margin-bottom:30px;">Selamat datang di portal absensi terintegrasi</p>
-        <button class="btn btn-primary" onclick="showView('viewSiswa')">📱 Portal Siswa</button>
-        <div style="margin: 15px 0; text-align:center; font-size: 0.8rem; color:#ccc;">ATAU</div>
-        <button class="btn btn-outline" onclick="showView('viewGuru')">👨‍🏫 Dashboard Guru</button>
+        <h1 class="title">Sistem Absensi v4.0</h1>
+        <p style="text-align:center; color:#666; margin-bottom:30px;">Silakan pilih akses masuk:</p>
+        <button class="btn btn-primary" onclick="showView('viewSiswa')" style="margin-bottom:15px;">Portal Siswa</button>
+        <button class="btn btn-outline" onclick="showView('viewLoginGuru')">Dashboard Guru (Private)</button>
     </div>
 
-    <!-- 2. VIEW SISWA (FORM) -->
+    <!-- 2. LOGIN GURU (PRIVATE) -->
+    <div id="viewLoginGuru" class="card hidden">
+        <h2 class="title">Verifikasi Admin</h2>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" id="logEmail" placeholder="">
+            <label>Nama</label>
+            <input type="text" id="logNama" placeholder="">
+            <label>Kata Sandi</label>
+            <input type="password" id="logPass" placeholder="">
+        </div>
+        <button class="btn btn-primary" onclick="authGuru()">Masuk Dashboard</button>
+        <button onclick="showView('viewRole')" style="margin-top:15px; background:none; border:none; color:gray; cursor:pointer; width:100%;">Kembali</button>
+    </div>
+
+    <!-- 3. VIEW SISWA -->
     <div id="viewSiswa" class="card hidden">
         <h2 class="title">Absensi Siswa</h2>
-        <div class="timer-info">
-            Batas Absen Tepat Waktu: <strong>08:00 WIB</strong>
+        <div style="background:#f0f4ff; padding:10px; border-radius:10px; font-size:0.8rem; margin-bottom:15px; text-align:center;">
+            Batas Tepat Waktu: <strong>08:00 WIB</strong>
         </div>
-        
-        <label>Nama Lengkap</label>
-        <input type="text" id="inNama" placeholder="Contoh: Budi Santoso">
-
-        <label>Pilih Kelas</label>
+        <input type="text" id="inNama" placeholder="Nama Lengkap">
         <select id="inKelas">
-            <option>X - RPL 1</option>
-            <option>XI - TKJ 2</option>
+            <option>X - RPL</option>
+            <option>XI - TKJ</option>
             <option>XII - Multimedia</option>
         </select>
-
-        <button class="btn btn-outline" onclick="openCamera()">📸 Ambil Foto Kehadiran</button>
+        <button class="btn btn-outline" onclick="openCamera()">📸 Ambil Selfie</button>
         <img id="previewFoto" style="width:100%; border-radius:15px; margin: 15px 0; display:none;">
-
-        <button id="btnSubmit" class="btn btn-primary hidden" onclick="prosesAbsenSiswa()">Kirim Absensi</button>
-        <button onclick="showView('viewRole')" style="margin-top:15px; background:none; border:none; color:gray; cursor:pointer; width:100%;">← Kembali</button>
+        <button id="btnSubmit" class="btn btn-primary hidden" onclick="prosesAbsenSiswa()">Kirim Absen</button>
+        <button onclick="showView('viewRole')" style="margin-top:10px; border:none; background:none; color:gray; cursor:pointer; width:100%;">Batal</button>
     </div>
 
-    <!-- 3. VIEW GURU (DASHBOARD) -->
+    <!-- 4. DASHBOARD GURU -->
     <div id="viewGuru" class="card hidden" style="max-width: 900px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="color:var(--primary)">Dashboard Guru</h2>
-            <button onclick="showView('viewRole')" class="badge bg-danger" style="border:none; cursor:pointer;">Keluar</button>
+            <h2 style="color:var(--primary)">Panel Guru</h2>
+            <button onclick="logoutGuru()" class="badge bg-danger" style="border:none; cursor:pointer;">Logout</button>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-box"><h3>Siswa</h3><p id="sTotal">0</p></div>
+            <div class="stat-box"><h3>Total</h3><p id="sTotal">0</p></div>
             <div class="stat-box" style="border-color:var(--success)"><h3>Tepat</h3><p id="sTepat" style="color:var(--success)">0</p></div>
             <div class="stat-box" style="border-color:var(--danger)"><h3>Lambat</h3><p id="sLambat" style="color:var(--danger)">0</p></div>
-        </div>
-
-        <div class="search-box">
-            <input type="text" id="searchName" placeholder="Cari nama siswa..." onkeyup="renderTabelGuru()" style="margin-bottom:0;">
         </div>
 
         <div class="table-wrapper">
@@ -126,21 +123,16 @@
                 <tbody id="bodyTabelGuru"></tbody>
             </table>
         </div>
-        <button class="btn btn-danger" onclick="resetData()" style="margin-top:20px; font-size:0.8rem; padding:10px;">Reset Database</button>
     </div>
 
-    <!-- 4. MODAL DETAIL FOTO -->
-    <div id="modalDetail" class="modal" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-close" onclick="closeModal()">×</div>
-            <img id="detailFoto" style="width:100%; height:300px; object-fit:cover;">
-            <div style="padding:20px;">
-                <h3 id="detailNama">Nama Siswa</h3>
-                <p id="detailKelas" style="color:#666;"></p>
-                <hr style="margin:10px 0; border:0; border-top:1px solid #eee;">
-                <p>Status: <span id="detailStatus" class="badge"></span></p>
-                <p>Waktu: <span id="detailJam"></span></p>
-            </div>
+    <!-- MODAL DETAIL -->
+    <div id="modalDetail" class="modal" onclick="this.style.display='none'">
+        <div class="modal-content" onclick="event.stopPropagation()" style="padding:20px;">
+            <img id="detailFoto" style="width:100%; border-radius:15px; margin-bottom:15px;">
+            <h3 id="detailNama"></h3>
+            <p id="detailKelas"></p>
+            <p id="detailWaktu"></p>
+            <span id="detailBadge" class="badge"></span>
         </div>
     </div>
 
@@ -149,13 +141,43 @@
 <script>
     let photoBase64 = "";
 
+    // CEK SESSION SAAT REFRESH
+    window.onload = () => {
+        const session = sessionStorage.getItem('guruLogin');
+        if (session === 'true') {
+            showView('viewGuru');
+        } else {
+            showView('viewRole');
+        }
+    };
+
     function showView(id) {
         document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
         if(id === 'viewGuru') renderTabelGuru();
     }
 
-    // LOGIKA KAMERA
+    // AUTH GURU (RAHASIA)
+    function authGuru() {
+        const e = document.getElementById('logEmail').value;
+        const n = document.getElementById('logNama').value;
+        const p = document.getElementById('logPass').value;
+
+        // Kode rahasia sesuai permintaan
+        if(e === "deby verona" && n === "vero" && p === "patrobas") {
+            sessionStorage.setItem('guruLogin', 'true');
+            showView('viewGuru');
+        } else {
+            alert("Akses Ditolak! Kode Verifikasi Salah.");
+        }
+    }
+
+    function logoutGuru() {
+        sessionStorage.clear();
+        location.reload();
+    }
+
+    // LOGIKA KAMERA & ABSEN
     function openCamera() {
         const input = document.createElement('input');
         input.type = 'file'; input.accept = 'image/*'; input.capture = 'user';
@@ -172,97 +194,60 @@
         input.click();
     }
 
-    // LOGIKA ABSENSI (CEK JAM 08:00)
     function prosesAbsenSiswa() {
         const nama = document.getElementById('inNama').value;
         const kelas = document.getElementById('inKelas').value;
-        if(!nama) return alert("Nama tidak boleh kosong!");
+        if(!nama || !photoBase64) return alert("Lengkapi data dan foto!");
 
-        const sekarang = new Date();
-        const jam = sekarang.getHours();
-        const menit = sekarang.getMinutes();
-        const waktuString = jam.toString().padStart(2, '0') + ":" + menit.toString().padStart(2, '0');
+        const skrg = new Date();
+        const jam = skrg.getHours();
+        const mnt = skrg.getMinutes();
+        const waktuStr = jam.toString().padStart(2, '0') + ":" + mnt.toString().padStart(2, '0');
         
-        // Logika Batas Waktu 08:00
-        let status = "Tepat Waktu";
-        if (jam > 8 || (jam === 8 && menit > 0)) {
-            status = "Terlambat";
-        }
+        let status = (jam > 8 || (jam === 8 && mnt > 0)) ? "Terlambat" : "Tepat Waktu";
 
-        // Simpan ke Database Lokal
         const db = JSON.parse(localStorage.getItem('db_sekolah')) || [];
-        db.push({
-            nama: nama,
-            kelas: kelas,
-            jam: waktuString,
-            status: status,
-            foto: photoBase64
-        });
+        db.push({ nama, kelas, jam: waktuStr, status, foto: photoBase64 });
         localStorage.setItem('db_sekolah', JSON.stringify(db));
 
-        // Feedback warna ke siswa
-        const warnaText = status === "Terlambat" ? "SANGAT DISAYANGKAN (TERLAMBAT)" : "TEPAT WAKTU";
-        alert(`Absensi Berhasil!\nNama: ${nama}\nJam: ${waktuString}\nStatus: ${warnaText}`);
+        alert(`Absen berhasil dikirim sebagai ${status}!`);
         location.reload();
     }
 
-    // RENDER DASHBOARD GURU
     function renderTabelGuru() {
         const db = JSON.parse(localStorage.getItem('db_sekolah')) || [];
-        const keyword = document.getElementById('searchName').value.toLowerCase();
         const tbody = document.getElementById('bodyTabelGuru');
         tbody.innerHTML = "";
+        let tL = 0, tT = 0;
 
-        let tLambat = 0, tTepat = 0;
-
-        db.forEach((s, index) => {
-            if(s.nama.toLowerCase().includes(keyword)) {
-                if(s.status === "Terlambat") tLambat++; else tTepat++;
-                
-                const statusBadge = s.status === "Terlambat" ? 'bg-danger' : 'bg-success';
-                
-                tbody.innerHTML += `
-                    <tr onclick="openModal(${index})">
-                        <td><img src="${s.foto}" class="img-table"></td>
-                        <td><strong>${s.nama}</strong><br><small>${s.kelas}</small></td>
-                        <td>${s.jam}</td>
-                        <td><span class="badge ${statusBadge}">${s.status}</span></td>
-                    </tr>
-                `;
-            }
+        db.forEach((s, i) => {
+            if(s.status === "Terlambat") tL++; else tT++;
+            const badge = s.status === "Terlambat" ? 'bg-danger' : 'bg-success';
+            tbody.innerHTML += `
+                <tr onclick="openModal(${i})">
+                    <td><img src="${s.foto}" class="img-table"></td>
+                    <td><strong>${s.nama}</strong><br><small>${s.kelas}</small></td>
+                    <td>${s.jam}</td>
+                    <td><span class="badge ${badge}">${s.status}</span></td>
+                </tr>
+            `;
         });
-
         document.getElementById('sTotal').innerText = db.length;
-        document.getElementById('sTepat').innerText = tTepat;
-        document.getElementById('sLambat').innerText = tLambat;
+        document.getElementById('sTepat').innerText = tT;
+        document.getElementById('sLambat').innerText = tL;
     }
 
-    // MODAL DETAIL
-    function openModal(index) {
-        const db = JSON.parse(localStorage.getItem('db_sekolah'));
-        const data = db[index];
-        
+    function openModal(i) {
+        const data = JSON.parse(localStorage.getItem('db_sekolah'))[i];
+        document.getElementById('detailFoto').src = data.foto;
         document.getElementById('detailNama').innerText = data.nama;
         document.getElementById('detailKelas').innerText = data.kelas;
-        document.getElementById('detailJam').innerText = data.jam + " WIB";
-        document.getElementById('detailFoto').src = data.foto;
-        
-        const st = document.getElementById('detailStatus');
-        st.innerText = data.status;
-        st.className = "badge " + (data.status === "Terlambat" ? "bg-danger" : "bg-success");
-        
+        document.getElementById('detailWaktu').innerText = "Absen pukul: " + data.jam;
+        const b = document.getElementById('detailBadge');
+        b.innerText = data.status;
+        b.className = "badge " + (data.status === "Terlambat" ? "bg-danger" : "bg-success");
         document.getElementById('modalDetail').style.display = 'flex';
     }
-
-    function closeModal() { document.getElementById('modalDetail').style.display = 'none'; }
-
-    function resetData() {
-        if(confirm("Hapus semua data absensi?")) {
-            localStorage.clear();
-            location.reload();
-        }
-    }
 </script>
-
 </body>
 </html>
