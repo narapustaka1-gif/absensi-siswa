@@ -3,162 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Absensi SMA Bahagia Indonesia</title>
+    <title>Sistem Absensi Digital - SMA Bahagia Indonesia</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
             --secondary: #f43f5e;
             --accent: #10b981;
-            --bg-gradient: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            --glass: rgba(255, 255, 255, 0.9);
         }
-
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
         body { 
-            background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 15s ease infinite;
-            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://images.unsplash.com/photo-1523050853063-bd80e27433fb?auto=format&fit=crop&q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
         }
-
-        .header { text-align: center; color: white; margin-bottom: 25px; }
-        .header h1 { font-size: 2rem; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
         .card {
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 30px;
-            padding: 40px; width: 100%; max-width: 480px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            transition: 0.3s; position: relative;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 35px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            animation: fadeIn 0.5s ease;
         }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .hidden { display: none !important; }
 
-        /* Input & Password Toggle */
-        .input-group { margin-bottom: 18px; position: relative; }
-        label { display: block; font-size: 0.7rem; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
+        /* Typography */
+        h1 { color: white; text-align: center; margin-bottom: 20px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        h2 { text-align: center; margin-bottom: 20px; color: #1e293b; }
+        .subtitle { text-align: center; font-size: 0.85rem; color: #64748b; margin-bottom: 25px; }
+
+        /* Form Styling */
+        .input-group { margin-bottom: 15px; position: relative; }
+        label { display: block; font-size: 0.7rem; font-weight: 800; color: #475569; margin-bottom: 5px; text-transform: uppercase; }
         input, select {
-            width: 100%; padding: 15px 18px; border-radius: 15px; border: 2px solid #f1f5f9;
+            width: 100%; padding: 14px 18px; border-radius: 12px; border: 2px solid #e2e8f0;
             font-size: 1rem; outline: none; transition: 0.3s;
         }
         input:focus { border-color: var(--primary); }
-        
-        .pass-container { position: relative; }
-        .toggle-pass {
-            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
-            cursor: pointer; font-size: 1.2rem; user-select: none;
+
+        /* Eye Art Styling */
+        .eye-toggle {
+            position: absolute; right: 15px; top: 38px; cursor: pointer;
+            font-size: 1.2rem; user-select: none; opacity: 0.6;
         }
 
+        /* Buttons */
         .btn {
-            width: 100%; padding: 18px; border: none; border-radius: 15px;
-            font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 1rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 16px; border: none; border-radius: 15px;
+            font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 0.95rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px;
         }
-        .btn-main { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-ghost { background: transparent; color: #475569; border: 2px solid #e2e8f0; }
         .btn-danger { background: var(--secondary); color: white; }
-        .btn-ghost { background: transparent; color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; }
+        .btn-back { background: #f1f5f9; color: #64748b; border: none; margin-top: 15px; }
 
-        .timer-display { background: #fee2e2; color: #ef4444; padding: 10px; border-radius: 10px; font-weight: 800; text-align: center; margin-bottom: 20px; }
-        .badge { padding: 5px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; }
-        .late { background: #fee2e2; color: #ef4444; }
-        .ontime { background: #dcfce7; color: #10b981; }
+        /* Admin Controls */
+        .control-panel { background: #fff; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .timer-badge { background: #fee2e2; color: #ef4444; padding: 10px; border-radius: 10px; font-weight: 800; text-align: center; margin-bottom: 15px; }
 
+        /* Table */
+        .table-wrap { overflow-x: auto; margin-top: 15px; max-height: 250px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        th { text-align: left; padding: 10px; border-bottom: 2px solid #f1f5f9; color: #64748b; }
+        td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; }
+        .avatar { width: 35px; height: 35px; border-radius: 10px; object-fit: cover; }
+
+        /* Copyright */
         .copyright { margin-top: 25px; color: white; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
         .circle-c { width: 18px; height: 18px; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-
-        .table-wrap { overflow-x: auto; margin-top: 15px; max-height: 200px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        td, th { padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>SMA Bahagia Indonesia</h1>
-    </div>
+    <h1>SMA Bahagia Indonesia</h1>
 
-    <!-- VIEW: SISTEM TERKUNCI (GLOBAL/INDIVIDUAL) -->
+    <!-- 1. VIEW: LOCKED -->
     <div id="vLocked" class="card hidden" style="text-align:center;">
-        <div style="font-size:50px;">🔒</div>
-        <h2 id="lockTitle" style="color:var(--secondary)">Akses Terkunci</h2>
-        <p id="lockDesc" style="margin-top:15px; color:#64748b; line-height: 1.5;"></p>
-        <button class="btn btn-ghost" onclick="go('vGuruLogin')">Login Admin</button>
+        <div style="font-size:60px; margin-bottom:15px;">🔒</div>
+        <h2 id="lTitle">Akses Ditutup</h2>
+        <p id="lDesc" style="color:#64748b; line-height:1.6;"></p>
+        <button class="btn btn-main" onclick="go('vGuruLogin')" style="margin-top:20px;">Portal Guru</button>
     </div>
 
-    <!-- VIEW: MENU AWAL -->
+    <!-- 2. VIEW: MENU UTAMA -->
     <div id="vMain" class="card">
-        <div id="timerSiswa" class="timer-display hidden">Sisa Waktu: <span id="timeLeft">00:00</span></div>
-        <h2 style="text-align:center; margin-bottom:25px;">Portal Kehadiran</h2>
-        <button class="btn btn-main" onclick="checkGate('vSiswaLogin')">Masuk Portal Siswa</button>
-        <button class="btn btn-ghost" onclick="go('vGuruLogin')">Dashboard Guru</button>
+        <div id="timerSiswa" class="timer-badge hidden">Sisa Waktu: <span id="timeLeft">00:00</span></div>
+        <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80&w=400" style="width:100%; border-radius:20px; margin-bottom:20px;">
+        <h2>Portal Kehadiran</h2>
+        <button class="btn btn-main" onclick="startCheck('vSiswaNIS')">Siswa: Mulai Absen</button>
+        <button class="btn btn-ghost" onclick="go('vGuruLogin')">Login Dashboard Guru</button>
     </div>
 
-    <!-- VIEW: SISWA NIS -->
-    <div id="vSiswaLogin" class="card hidden">
-        <h2>Verifikasi NIS</h2>
+    <!-- 3. VIEW: SISWA NIS -->
+    <div id="vSiswaNIS" class="card hidden">
+        <h2>Verifikasi Identitas</h2>
         <div class="input-group">
-            <label>Nomor Induk Siswa</label>
-            <input type="number" id="inNIS" placeholder="Masukkan NIS anda">
+            <label>Nomor Induk Siswa (NIS)</label>
+            <input type="number" id="inNIS" placeholder="Contoh: 2024001">
         </div>
-        <button class="btn btn-main" onclick="go('vSiswaForm')">Validasi Data</button>
-        <button class="btn btn-ghost" onclick="go('vMain')">Batal</button>
+        <button class="btn btn-main" onclick="go('vSiswaForm')">Lanjutkan</button>
+        <button class="btn btn-back" onclick="go('vMain')">← Kembali ke Menu</button>
     </div>
 
-    <!-- VIEW: SISWA FORM -->
+    <!-- 4. VIEW: SISWA FORM -->
     <div id="vSiswaForm" class="card hidden">
-        <h2>Data Lengkap</h2>
-        <div class="input-group"><label>Nama</label><input type="text" id="inNama"></div>
-        <div class="input-group"><label>Kelas</label><select id="inKelas"><option>X - Bahagia</option><option>XI - Bahagia</option><option>XII - Bahagia</option></select></div>
-        <button class="btn btn-ghost" onclick="takePic()">📸 Ambil Selfie</button>
-        <img id="prev" style="width:100%; border-radius:15px; margin:15px 0; display:none; border:2px solid var(--primary);">
-        <button id="btnKirim" class="btn btn-main hidden" onclick="saveAbsen()">Kirim Absen</button>
+        <h2>Lengkapi Data Diri</h2>
+        <div class="input-group"><label>Nama Lengkap</label><input type="text" id="inNama" placeholder="Masukkan Nama Sesuai Absen"></div>
+        <div class="input-group"><label>Kelas</label>
+            <select id="inKelas">
+                <option>X - Bahagia 1</option><option>XI - Bahagia 2</option><option>XII - Bahagia 3</option>
+            </select>
+        </div>
+        <button class="btn btn-ghost" onclick="takePic()">📸 Ambil Foto Selfie</button>
+        <img id="prev" style="width:100%; border-radius:15px; margin:15px 0; display:none;">
+        <button id="btnKirim" class="btn btn-main hidden" onclick="saveData()">Kirim Absensi</button>
+        <button class="btn btn-back" onclick="go('vSiswaNIS')">← Edit NIS Kembali</button>
     </div>
 
-    <!-- VIEW: BERHASIL -->
+    <!-- 5. VIEW: SUKSES -->
     <div id="vSuccess" class="card hidden" style="text-align:center;">
-        <div style="font-size:50px;">✨</div>
-        <h2 style="color:var(--accent)">Terima Kasih!</h2>
-        <p id="succMsg" style="margin:15px 0;"></p>
-        <button class="btn btn-main" onclick="lockAndHome()">Kembali ke Menu Awal</button>
+        <div style="font-size:60px; margin-bottom:15px;">✅</div>
+        <h2>Absensi Diterima!</h2>
+        <p id="succText" style="color:#64748b; margin-bottom:20px;"></p>
+        <button class="btn btn-main" onclick="finishLock()">Selesai & Kunci</button>
     </div>
 
-    <!-- VIEW: GURU LOGIN -->
+    <!-- 6. VIEW: GURU LOGIN -->
     <div id="vGuruLogin" class="card hidden">
-        <h2>Admin Login</h2>
-        <div class="input-group"><input type="text" id="gE" placeholder="Email"></div>
-        <div class="input-group"><input type="text" id="gN" placeholder="Nama"></div>
-        <div class="input-group pass-container">
-            <input type="password" id="gP" placeholder="Password">
-            <span class="toggle-pass" onclick="togglePass('gP')">👁️</span>
+        <h2>Admin Verification</h2>
+        <div class="input-group"><label>Username / Email</label><input type="text" id="gE"></div>
+        <div class="input-group"><label>Panggilan</label><input type="text" id="gN"></div>
+        <div class="input-group">
+            <label>Kata Sandi</label>
+            <input type="password" id="gP">
+            <span class="eye-toggle" onclick="toggleEye('gP')">👁️‍🗨️</span>
         </div>
-        <button class="btn btn-main" onclick="authG()">Buka Panel</button>
-        <button class="btn btn-ghost" onclick="go('vMain')">Kembali</button>
+        <button class="btn btn-main" onclick="auth()">Masuk Dashboard</button>
+        <button class="btn btn-back" onclick="go('vMain')">Kembali</button>
     </div>
 
-    <!-- VIEW: GURU DASHBOARD -->
-    <div id="vGuruDash" class="card hidden" style="max-width: 600px;">
+    <!-- 7. VIEW: GURU DASHBOARD -->
+    <div id="vGuruDash" class="card hidden" style="max-width: 650px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3>Admin Panel</h3>
-            <button onclick="logout()" class="badge late" style="border:none; cursor:pointer;">Keluar</button>
+            <h3>Monitoring Real-time</h3>
+            <button onclick="logout()" class="badge" style="background:#fee2e2; color:#ef4444; border:none; padding:5px 10px; border-radius:8px; cursor:pointer; font-weight:800;">Logout</button>
         </div>
-        
-        <div style="background:#f8fafc; padding:15px; border-radius:15px; margin-bottom:15px;">
-            <label>Kontrol Global:</label>
-            <div style="display:flex; gap:10px; margin-top:5px;">
-                <button class="btn btn-danger" style="padding:10px; font-size:0.8rem;" onclick="setGlobalLock(true)">Kunci Semua</button>
-                <button class="btn btn-main" style="padding:10px; font-size:0.8rem; background:var(--accent);" onclick="setGlobalLock(false)">Buka Semua</button>
+
+        <div class="control-panel">
+            <label style="font-size:0.7rem; font-weight:800; color:#64748b;">KONTROL SISTEM:</label>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn btn-danger" style="margin:0; flex:1;" onclick="setGlobal(true)">BERHENTI (LOCK)</button>
+                <button class="btn btn-main" style="margin:0; flex:1; background:var(--accent);" onclick="setGlobal(false)">MULAI (OPEN)</button>
             </div>
-            <div style="margin-top:15px;">
-                <label>Set Timer (Menit):</label>
-                <div style="display:flex; gap:10px; margin-top:5px;">
-                    <input type="number" id="timerInput" placeholder="Menit" style="padding:10px;">
-                    <button class="btn btn-main" style="width:100px; padding:10px; font-size:0.8rem;" onclick="startTimer()">Set</button>
-                </div>
+            <div style="margin-top:15px; display:flex; gap:10px;">
+                <input type="number" id="tIn" placeholder="Menit" style="width:80px;">
+                <button class="btn btn-main" style="margin:0;" onclick="setTimer()">AKTIFKAN TIMER</button>
             </div>
         </div>
 
         <div class="table-wrap">
             <table>
-                <thead><tr><th>Nama</th><th>Jam</th><th>Status</th></tr></thead>
-                <tbody id="listG"></tbody>
+                <thead><tr><th>Foto</th><th>Siswa / Kelas</th><th>Waktu</th><th>Ket</th></tr></thead>
+                <tbody id="resList"></tbody>
             </table>
         </div>
     </div>
@@ -168,132 +190,143 @@
     </div>
 
 <script>
-    let currentImg = "";
-    let timerInterval;
+    let photo = "";
+    let clock;
 
     window.onload = () => {
-        checkGateStatus();
-        updateTimerDisplay();
+        checkGate();
+        runTimerLogic();
     };
 
     function go(id) {
         document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
-        if(id === 'vGuruDash') renderGuru();
+        if(id === 'vGuruDash') renderTable();
     }
 
-    // FUNGSI CEK PINTU MASUK
-    function checkGateStatus() {
-        const isGlobalLocked = localStorage.getItem('globalLocked') === 'true';
-        const isUserLocked = localStorage.getItem('userHasFinished') === 'true';
+    function checkGate() {
+        const isGlobal = localStorage.getItem('gLock') === 'true';
+        const isUser = localStorage.getItem('uDone') === 'true';
+        const guru = sessionStorage.getItem('isGuru');
 
-        if (isGlobalLocked && !sessionStorage.getItem('isGuru')) {
-            document.getElementById('lockTitle').innerText = "Sistem Ditutup";
-            document.getElementById('lockDesc').innerText = "Mohon maaf, sesi absensi untuk hari ini telah berakhir atau ditutup oleh Admin.";
+        if(guru) return;
+
+        if(isGlobal) {
+            document.getElementById('lTitle').innerText = "Sesi Berakhir";
+            document.getElementById('lDesc').innerText = "Mohon maaf, Guru telah menutup akses absensi untuk sesi ini.";
             go('vLocked');
-        } else if (isUserLocked && !sessionStorage.getItem('isGuru')) {
-            document.getElementById('lockTitle').innerText = "Absensi Selesai";
-            document.getElementById('lockDesc').innerText = "Anda sudah melakukan absensi sebelumnya. Silakan kembali pada sesi berikutnya.";
+        } else if(isUser) {
+            document.getElementById('lTitle').innerText = "Sudah Absen";
+            document.getElementById('lDesc').innerText = "Perangkat ini telah digunakan untuk absen. Terima kasih!";
             go('vLocked');
         }
     }
 
-    function checkGate(target) {
-        checkGateStatus();
-        const locked = document.getElementById('vLocked').classList.contains('hidden');
-        if(locked) go(target);
+    function startCheck(id) {
+        checkGate();
+        if(!document.getElementById('vLocked').classList.contains('hidden')) return;
+        go(id);
     }
 
-    function togglePass(id) {
-        const el = document.getElementById(id);
-        el.type = el.type === 'password' ? 'text' : 'password';
+    // TOGGLE EYE ART
+    function toggleEye(id) {
+        const x = document.getElementById(id);
+        x.type = x.type === 'password' ? 'text' : 'password';
     }
 
-    // ADMIN CONTROL
-    function setGlobalLock(status) {
-        localStorage.setItem('globalLocked', status);
-        if(!status) localStorage.removeItem('userHasFinished'); // Reset kunci individu saat admin buka semua
-        alert(status ? "Website DIKUNCI untuk semua siswa." : "Website DIBUKA kembali.");
-        location.reload();
+    // ADMIN FUNCTIONS
+    function setGlobal(val) {
+        localStorage.setItem('gLock', val);
+        if(!val) localStorage.removeItem('uDone');
+        alert(val ? "Sistem Resmi Ditutup" : "Sistem Resmi Dibuka");
+        renderTable(); // Tetap di halaman
     }
 
-    function startTimer() {
-        const mins = document.getElementById('timerInput').value;
-        if(!mins) return;
-        localStorage.setItem('absensiEndTime', Date.now() + (mins * 60000));
-        updateTimerDisplay();
+    function setTimer() {
+        const m = document.getElementById('tIn').value;
+        if(!m) return;
+        localStorage.setItem('endTime', Date.now() + (m * 60000));
+        alert("Timer berhasil dipasang!");
+        runTimerLogic();
     }
 
-    function updateTimerDisplay() {
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            const end = localStorage.getItem('absensiEndTime');
+    function runTimerLogic() {
+        clearInterval(clock);
+        clock = setInterval(() => {
+            const end = localStorage.getItem('endTime');
             if(!end) return;
             const diff = end - Date.now();
             if(diff <= 0) {
-                clearInterval(timerInterval);
-                localStorage.removeItem('absensiEndTime');
-                localStorage.setItem('globalLocked', 'true');
-                checkGateStatus();
+                clearInterval(clock);
+                localStorage.removeItem('endTime');
+                localStorage.setItem('gLock', 'true');
+                checkGate();
             } else {
+                const m = Math.floor(diff/60000), s = Math.floor((diff%60000)/1000);
                 document.getElementById('timerSiswa').classList.remove('hidden');
-                const m = Math.floor(diff / 60000), s = Math.floor((diff % 60000) / 1000);
                 document.getElementById('timeLeft').innerText = `${m}:${s.toString().padStart(2,'0')}`;
             }
         }, 1000);
     }
 
-    // ABSENSI
+    // SISWA FUNCTIONS
     function takePic() {
-        const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.capture='user';
-        inp.onchange = e => {
+        const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.capture='user';
+        i.onchange = e => {
             const r = new FileReader();
             r.onload = f => {
-                currentImg = f.target.result;
-                document.getElementById('prev').src = currentImg;
+                photo = f.target.result;
+                document.getElementById('prev').src = photo;
                 document.getElementById('prev').style.display = 'block';
                 document.getElementById('btnKirim').classList.remove('hidden');
             };
             r.readAsDataURL(e.target.files[0]);
         };
-        inp.click();
+        i.click();
     }
 
-    function saveAbsen() {
+    function saveData() {
         const n = document.getElementById('inNama').value;
+        const k = document.getElementById('inKelas').value;
+        if(!n) return alert("Nama wajib diisi!");
+
         const d = new Date();
         const jam = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
-        const status = (d.getHours() > 8 || (d.getHours() === 8 && d.getMinutes() > 0)) ? "Terlambat" : "Tepat Waktu";
+        const st = (d.getHours() > 8 || (d.getHours() === 8 && d.getMinutes() > 0)) ? "Terlambat" : "Hadir";
 
-        let db = JSON.parse(localStorage.getItem('db_final')) || [];
-        db.push({n, jam, status, foto:currentImg});
-        localStorage.setItem('db_final', JSON.stringify(db));
+        let db = JSON.parse(localStorage.getItem('abs_db')) || [];
+        db.push({n, k, jam, st, photo});
+        localStorage.setItem('abs_db', JSON.stringify(db));
 
-        document.getElementById('succMsg').innerText = `Data anda (${n}) telah diterima guru.`;
+        document.getElementById('succText').innerText = `Data ${n} (${k}) telah tersimpan pada pukul ${jam}.`;
         go('vSuccess');
     }
 
-    // KUNCI HALAMAN SETELAH ABSEN
-    function lockAndHome() {
-        localStorage.setItem('userHasFinished', 'true'); // Mengunci perangkat ini
-        location.reload(); // Akan memicu checkGateStatus() dan menampilkan halaman kunci
+    function finishLock() {
+        localStorage.setItem('uDone', 'true');
+        location.reload();
     }
 
-    function authG() {
+    function auth() {
         if(document.getElementById('gE').value === "deby verona" && 
            document.getElementById('gN').value === "vero" && 
            document.getElementById('gP').value === "patrobas") {
             sessionStorage.setItem('isGuru', 'true');
             go('vGuruDash');
-        } else { alert("Data Salah!"); }
+        } else { alert("Akses Ditolak!"); }
     }
 
-    function renderGuru() {
-        const db = JSON.parse(localStorage.getItem('db_final')) || [];
-        const list = document.getElementById('listG');
-        list.innerHTML = "";
-        db.forEach(s => {
-            list.innerHTML += `<tr><td>${s.n}</td><td>${s.jam}</td><td><span class="badge ${s.status === 'Terlambat'?'late':'ontime'}">${s.status}</span></td></tr>`;
+    function renderTable() {
+        const db = JSON.parse(localStorage.getItem('abs_db')) || [];
+        const body = document.getElementById('resList');
+        body.innerHTML = "";
+        db.reverse().forEach(s => {
+            body.innerHTML += `<tr>
+                <td><img src="${s.photo}" class="avatar"></td>
+                <td><b>${s.n}</b><br><small>${s.k}</small></td>
+                <td>${s.jam}</td>
+                <td style="color:${s.st==='Hadir'?'#10b981':'#ef4444'}; font-weight:800;">${s.st}</td>
+            </tr>`;
         });
     }
 
