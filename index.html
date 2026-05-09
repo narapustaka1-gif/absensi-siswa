@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Absensi Terverifikasi</title>
+    <title>Quick Absen - Mode Demo</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #f0f2f5;
+            background: #eef2f7;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -18,192 +18,159 @@
         .container { width: 100%; max-width: 400px; }
         .card {
             background: white;
-            border-radius: 24px;
+            border-radius: 30px;
             padding: 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            transition: all 0.4s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
         .title {
             text-align: center;
-            color: #1a73e8;
+            color: #4a4ae1;
             margin-bottom: 25px;
             font-weight: 800;
+            font-size: 1.5rem;
         }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #444; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; color: #555; }
         input, select {
-            width: 100%; padding: 12px 16px; border: 2px solid #eee; border-radius: 12px;
-            font-size: 1rem; outline: none; transition: 0.3s;
+            width: 100%; padding: 14px; border: 2px solid #f0f0f0; border-radius: 15px;
+            font-size: 1rem; outline: none; transition: 0.3s; background: #fafafa;
         }
-        input:focus { border-color: #1a73e8; }
+        input:focus { border-color: #4a4ae1; background: white; }
         
         .btn {
-            width: 100%; padding: 15px; border: none; border-radius: 12px;
+            width: 100%; padding: 15px; border: none; border-radius: 15px;
             font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s;
         }
-        .btn-primary { background: #1a73e8; color: white; }
-        .btn-camera { background: #f8f9fa; color: #1a73e8; border: 2px dashed #1a73e8; margin-top: 10px; }
-        .btn-success { background: #34a853; color: white; margin-top: 20px; }
+        .btn-camera { background: #4a4ae1; color: white; margin-top: 10px; }
+        .btn-submit { background: #00d1b2; color: white; margin-top: 15px; display: none; }
 
-        .hidden { display: none; }
-        
-        /* Layar Sukses */
-        .success-screen { text-align: center; }
-        .success-icon { font-size: 50px; color: #34a853; margin-bottom: 15px; }
-        .timestamp { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-top: 20px; font-family: monospace; }
-        
         #photoPreview {
-            width: 100%; max-height: 200px; object-fit: cover; 
-            border-radius: 12px; margin-top: 15px; display: none;
+            width: 100%; border-radius: 15px; margin-top: 15px; 
+            display: none; border: 3px solid #eef2f7;
         }
+
+        /* Layar Sukses */
+        .success-screen { text-align: center; display: none; }
+        .icon-check { width: 70px; height: 70px; background: #00d1b2; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px; }
+        .lock-notice { color: #ff3860; font-size: 0.8rem; font-weight: 700; margin-top: 25px; padding: 10px; border: 1px dashed #ff3860; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 1. LAYAR LOGIN -->
-    <div id="stepLogin" class="card">
-        <h2 class="title">Masuk Akun</h2>
-        <div class="form-group">
-            <label>Email / NIS</label>
-            <input type="text" id="logEmail" placeholder="admin@demo.com">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="logPass" placeholder="123">
-        </div>
-        <button class="btn btn-primary" onclick="handleLogin()">Login</button>
-    </div>
-
-    <!-- 2. LAYAR ISI DATA (SETELAH LOGIN) -->
-    <div id="stepForm" class="card hidden">
-        <h2 class="title">Lengkapi Data</h2>
+    <!-- FORM ISI DATA (LANGSUNG MUNCUL) -->
+    <div id="absensiCard" class="card">
+        <h2 class="title">Absensi Siswa</h2>
+        
         <div class="form-group">
             <label>Nama Lengkap</label>
-            <input type="text" id="absNama" placeholder="Masukkan nama...">
+            <input type="text" id="inNama" placeholder="Ketik nama kamu...">
         </div>
+
         <div class="form-group">
             <label>Kelas</label>
-            <select id="absKelas">
-                <option value="X">Kelas X</option>
-                <option value="XI">Kelas XI</option>
-                <option value="XII">Kelas XII</option>
+            <select id="inKelas">
+                <option value="X">Kelas X (Sepuluh)</option>
+                <option value="XI">Kelas XI (Sebelas)</option>
+                <option value="XII">Kelas XII (Dua Belas)</option>
             </select>
         </div>
+
         <div class="form-group">
-            <label>Status Kehadiran</label>
-            <select id="absKet">
+            <label>Keterangan</label>
+            <select id="inKet">
                 <option value="Tepat Waktu">Tepat Waktu</option>
                 <option value="Terlambat">Terlambat</option>
                 <option value="Tidak Terlambat">Tidak Terlambat</option>
             </select>
         </div>
         
-        <button class="btn btn-camera" onclick="handleCapture()">📸 Ambil Foto (Google Lens Mode)</button>
-        <img id="photoPreview" alt="Preview">
+        <button class="btn btn-camera" onclick="openCamera()">📸 Ambil Foto Selfie</button>
+        <img id="photoPreview" alt="Foto Siswa">
         
-        <button class="btn btn-success" id="btnSubmit" onclick="handleSubmit()">Kirim Absensi</button>
+        <button class="btn btn-submit" id="btnSubmit" onclick="kirimData()">Kirim Absensi Sekarang</button>
     </div>
 
-    <!-- 3. LAYAR BERHASIL & TERKUNCI -->
-    <div id="stepFinal" class="card hidden success-screen">
-        <div class="success-icon">✔</div>
-        <h2 style="color: #34a853;">Absensi Berhasil!</h2>
-        <p id="congratsText" style="margin-top: 10px; color: #666;"></p>
+    <!-- LAYAR TERKUNCI -->
+    <div id="lockedCard" class="card success-screen">
+        <div class="icon-check">✓</div>
+        <h2 style="color: #00d1b2;">Berhasil!</h2>
+        <p id="msgSukses" style="margin: 15px 0; color: #555; line-height: 1.5;"></p>
         
-        <div class="timestamp">
-            <p><strong>Waktu:</strong> <span id="resTime"></span></p>
-            <p><strong>Status:</strong> <span id="resKet"></span></p>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 15px; font-size: 0.9rem;">
+            <p><strong>Jam:</strong> <span id="resJam"></span></p>
+            <p><strong>Status:</strong> <span id="resStatus"></span></p>
         </div>
-        
-        <p style="margin-top: 25px; font-size: 0.75rem; color: #e74c3c; font-weight: bold;">
-            🔒 Akses Terkunci. Anda sudah melakukan absensi hari ini.
-        </p>
+
+        <div class="lock-notice">
+            🔒 AKSES TERKUNCI<br>Kamu sudah absen hari ini.
+        </div>
+        <button onclick="resetDemo()" style="margin-top: 20px; background: none; border: none; color: #ccc; cursor: pointer; font-size: 0.7rem;">(Reset Demo untuk Coba Lagi)</button>
     </div>
 </div>
 
 <script>
-    let userData = null;
-    let userPhoto = null;
+    let capturedPhoto = null;
 
-    // Cek jika sudah pernah absen hari ini (Kunci Otomatis)
+    // Cek apakah sudah absen hari ini (Auto-Lock)
     window.onload = () => {
-        const lock = localStorage.getItem('absensi_lock');
-        const today = new Date().toLocaleDateString();
-        if (lock === today) {
-            showStep('stepFinal');
-            document.getElementById('congratsText').innerText = "Selamat, data Anda sudah tersimpan di sistem kami.";
-            document.getElementById('resTime').innerText = localStorage.getItem('last_time');
-            document.getElementById('resKet').innerText = localStorage.getItem('last_ket');
+        const hasAbsen = localStorage.getItem('demo_absen_hari_ini');
+        if (hasAbsen) {
+            tampilkanLayarTerkunci();
         }
     };
 
-    function showStep(id) {
-        document.getElementById('stepLogin').classList.add('hidden');
-        document.getElementById('stepForm').classList.add('hidden');
-        document.getElementById('stepFinal').classList.add('hidden');
-        document.getElementById(id).classList.remove('hidden');
-    }
-
-    // 1. Logic Login
-    function handleLogin() {
-        const email = document.getElementById('logEmail').value;
-        const pass = document.getElementById('logPass').value;
-
-        // Simple bypass untuk demo (admin@demo.com / 123)
-        if(email === "admin@demo.com" && pass === "123") {
-            showStep('stepForm');
-        } else {
-            alert("Email atau password salah! (Coba admin@demo.com / 123)");
-        }
-    }
-
-    // 2. Logic Ambil Foto
-    function handleCapture() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.capture = 'user'; // Memicu kamera HP
+    function openCamera() {
+        const picker = document.createElement('input');
+        picker.type = 'file';
+        picker.accept = 'image/*';
+        picker.capture = 'user'; 
         
-        input.onchange = (e) => {
-            const file = e.target.files[0];
+        picker.onchange = (e) => {
             const reader = new FileReader();
-            reader.onload = (event) => {
-                userPhoto = event.target.result;
-                const imgTag = document.getElementById('photoPreview');
-                imgTag.src = userPhoto;
-                imgTag.style.display = 'block';
+            reader.onload = (ev) => {
+                capturedPhoto = ev.target.result;
+                const img = document.getElementById('photoPreview');
+                img.src = capturedPhoto;
+                img.style.display = 'block';
+                document.getElementById('btnSubmit').style.display = 'block';
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(e.target.files[0]);
         };
-        input.click();
+        picker.click();
     }
 
-    // 3. Logic Submit
-    function handleSubmit() {
-        const nama = document.getElementById('absNama').value;
-        const ket = document.getElementById('absKet').value;
+    function kirimData() {
+        const nama = document.getElementById('inNama').value;
+        const ket = document.getElementById('inKet').value;
+
+        if (!nama) return alert("Nama jangan dikosongin ya!");
+
+        const jam = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
         
-        if(!nama || !userPhoto) {
-            alert("Mohon isi nama dan ambil foto selfie dulu!");
-            return;
-        }
+        // Simpan data biar terkunci
+        localStorage.setItem('demo_absen_hari_ini', 'true');
+        localStorage.setItem('demo_nama', nama);
+        localStorage.setItem('demo_jam', jam);
+        localStorage.setItem('demo_ket', ket);
 
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('id-ID');
-        const dateStr = now.toLocaleDateString();
+        tampilkanLayarTerkunci();
+    }
 
-        // Simpan status "Locked" ke LocalStorage
-        localStorage.setItem('absensi_lock', dateStr);
-        localStorage.setItem('last_time', timeStr);
-        localStorage.setItem('last_ket', ket);
+    function tampilkanLayarTerkunci() {
+        document.getElementById('absensiCard').style.display = 'none';
+        document.getElementById('lockedCard').style.display = 'block';
 
-        // Tampilkan layar sukses
-        document.getElementById('congratsText').innerText = `Selamat ${nama}, anda telah berhasil melakukan absensi!`;
-        document.getElementById('resTime').innerText = timeStr;
-        document.getElementById('resKet').innerText = ket;
-        
-        showStep('stepFinal');
+        const nama = localStorage.getItem('demo_nama');
+        document.getElementById('msgSukses').innerText = `Selamat ${nama}, kamu sudah berhasil melakukan absensi!`;
+        document.getElementById('resJam').innerText = localStorage.getItem('demo_jam') + " WIB";
+        document.getElementById('resStatus').innerText = localStorage.getItem('demo_ket');
+    }
+
+    // Fungsi khusus buat kamu biar bisa ngetes berulang kali tanpa hapus cache
+    function resetDemo() {
+        localStorage.clear();
+        location.reload();
     }
 </script>
 
