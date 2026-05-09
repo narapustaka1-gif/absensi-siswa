@@ -2,202 +2,151 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>AbsenKita v2.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Absensi Terpadu</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
-            min-height: 100vh;
-            display: flex; justify-content: center; align-items: center;
-            padding: 20px; color: #333;
-        }
-        .container { width: 100%; max-width: 400px; position: relative; }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 35px 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-            animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .title { text-align: center; font-size: 1.8rem; font-weight: 800; color: #007bff; margin-bottom: 10px; }
-        .subtitle { text-align: center; font-size: 0.9rem; color: #666; margin-bottom: 30px; }
-
-        /* FORM STYLES */
-        .form-group { margin-bottom: 18px; }
-        label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; color: #444; }
-        input, select {
-            width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 15px;
-            font-size: 1rem; outline: none; transition: 0.3s;
-        }
-        input:focus { border-color: #0093E9; }
-
-        .btn {
-            width: 100%; padding: 16px; border: none; border-radius: 15px;
-            font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s;
-        }
-        .btn-primary { background: #0093E9; color: white; margin-bottom: 15px; }
-        .btn-outline { background: white; border: 2px solid #0093E9; color: #0093E9; }
-        .btn-camera { background: #333; color: white; margin-top: 10px; }
-        .btn-submit { background: #28a745; color: white; margin-top: 20px; display: none; }
-
-        #photoPreview {
-            width: 100%; border-radius: 20px; margin-top: 15px; display: none;
-            border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        /* LAYERS */
+        /* CSS Gabungan */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f0f2f5; min-height: 100vh; padding: 20px; }
+        .card { background: white; max-width: 450px; margin: 20px auto; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .hidden { display: none; }
-        .success-screen { text-align: center; }
-        .lock-badge { 
-            background: #fff0f0; color: #e74c3c; padding: 10px; border-radius: 12px; 
-            font-weight: 800; font-size: 0.75rem; margin-top: 30px; display: inline-block;
-        }
-
-        footer { text-align: center; margin-top: 20px; color: white; font-size: 0.7rem; opacity: 0.8; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.3s; }
+        .btn-blue { background: #1a73e8; color: white; }
+        .btn-green { background: #34a853; color: white; }
+        .btn-outline { background: transparent; border: 2px solid #1a73e8; color: #1a73e8; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0 15px; border: 1px solid #ddd; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+        th, td { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
+        .img-preview { width: 40px; height: 40px; border-radius: 5px; object-fit: cover; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    
-    <!-- 1. TAMPILAN DEPAN (LOGIN/DAFTAR PAJANGAN) -->
-    <div id="viewAuth" class="card">
-        <h1 class="title">AbsenKita</h1>
-        <p class="subtitle">Sistem Absensi Digital Siswa</p>
-        
-        <div class="form-group">
-            <label>NIS / Username</label>
-            <input type="text" placeholder="Masukkan NIS..." id="fakeUser">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" placeholder="••••••••" id="fakePass">
-        </div>
-        
-        <!-- Tombol ini langsung arahkan ke form tanpa cek password -->
-        <button class="btn btn-primary" onclick="goToStep('viewForm')">Login</button>
-        <button class="btn btn-outline" onclick="alert('Fitur Daftar dalam pemeliharaan. Gunakan Login Demo.')">Daftar Akun</button>
+    <!-- 1. PILIH ROLE (HALAMAN DEPAN SEKALI) -->
+    <div id="roleSelection" class="card" style="text-align: center;">
+        <h2 style="margin-bottom: 20px;">Selamat Datang</h2>
+        <p style="margin-bottom: 20px; color: #666;">Silakan pilih akses masuk:</p>
+        <button class="btn btn-blue" onclick="showView('viewSiswa')">Masuk sebagai SISWA</button>
+        <button class="btn btn-outline" onclick="showView('viewGuru')">Masuk sebagai GURU</button>
     </div>
 
-    <!-- 2. TAMPILAN ISI DATA -->
-    <div id="viewForm" class="card hidden">
-        <h2 class="title" style="font-size: 1.4rem;">Data Kehadiran</h2>
-        <p class="subtitle">Silakan lengkapi detail hari ini</p>
-        
-        <div class="form-group">
-            <label>Nama Lengkap</label>
-            <input type="text" id="realNama" placeholder="Siapa namamu?">
-        </div>
-
-        <div class="form-group">
-            <label>Kelas</label>
-            <select id="realKelas">
-                <option>X - IPA 1</option>
-                <option>XI - IPS 2</option>
-                <option>XII - Bahasa</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Keterangan</label>
-            <select id="realKet">
-                <option>Tepat Waktu</option>
-                <option>Tidak Terlambat</option>
-                <option>Terlambat</option>
-            </select>
-        </div>
-
-        <button class="btn btn-camera" onclick="captureSelfie()">📸 Ambil Foto Selfie</button>
-        <img id="photoPreview">
-
-        <button class="btn btn-submit" id="btnKirim" onclick="prosesSelesai()">Kirim & Kunci Absensi</button>
+    <!-- 2. VIEW SISWA (LOGIN PAJANGAN) -->
+    <div id="viewSiswa" class="card hidden">
+        <h2 style="color:#1a73e8">Login Siswa</h2>
+        <input type="text" placeholder="NIS / Username">
+        <input type="password" placeholder="Password">
+        <button class="btn btn-blue" onclick="showView('viewFormSiswa')">Login</button>
+        <button onclick="showView('roleSelection')" style="background:none; border:none; color:blue; cursor:pointer;">← Kembali</button>
     </div>
 
-    <!-- 3. TAMPILAN SUKSES & TERKUNCI -->
-    <div id="viewLocked" class="card hidden success-screen">
-        <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
-        <h2 style="color: #28a745;">Berhasil Terkirim!</h2>
-        <p id="msgNama" style="margin: 15px 0; font-weight: 600;"></p>
-        
-        <div style="background: #f0f7ff; padding: 15px; border-radius: 20px; text-align: left; font-size: 0.9rem;">
-            <p>🕒 <strong>Waktu:</strong> <span id="resWaktu"></span></p>
-            <p>📝 <strong>Status:</strong> <span id="resStatus"></span></p>
-        </div>
-
-        <div class="lock-badge">🔒 AKSES TERKUNCI HINGGA BESOK</div>
-        <br>
-        <button onclick="localStorage.clear(); location.reload();" style="margin-top: 25px; border:none; background:none; color:#bbb; font-size:0.6rem; cursor:pointer;">[ Reset Demo ]</button>
+    <!-- 3. VIEW FORM ABSENSI -->
+    <div id="viewFormSiswa" class="card hidden">
+        <h3>Isi Kehadiran</h3>
+        <label>Nama</label><input type="text" id="namaSiswa">
+        <label>Kelas</label>
+        <select id="kelasSiswa">
+            <option>X - Multimedia</option>
+            <option>XI - RPL</option>
+            <option>XII - TKJ</option>
+        </select>
+        <label>Status</label>
+        <select id="ketSiswa">
+            <option>Tepat Waktu</option>
+            <option>Terlambat</option>
+        </select>
+        <button class="btn btn-outline" onclick="ambilFoto()">📸 Foto Selfie</button>
+        <img id="previewImg" style="width:100%; display:none; border-radius:10px; margin-bottom:10px;">
+        <button id="btnKirim" class="btn btn-green hidden" onclick="kirimAbsen()">Kirim Data</button>
     </div>
 
-    <footer>© 2026 Deby Verona • SMK Digital Indonesia</footer>
-</div>
+    <!-- 4. VIEW GURU (DASHBOARD) -->
+    <div id="viewGuru" class="card hidden" style="max-width: 600px;">
+        <div style="display:flex; justify-content: space-between;">
+            <h3>Data Absensi Guru</h3>
+            <button onclick="showView('roleSelection')" style="font-size:10px;">Keluar</button>
+        </div>
+        <table id="tabelGuru">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Nama</th>
+                    <th>Jam</th>
+                    <th>Ket</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button class="btn btn-blue" style="margin-top:20px;" onclick="hapusSemuaData()">Reset Semua Data</button>
+    </div>
 
-<script>
-    // Fungsi navigasi antar layar
-    function goToStep(stepId) {
-        document.getElementById('viewAuth').classList.add('hidden');
-        document.getElementById('viewForm').classList.add('hidden');
-        document.getElementById('viewLocked').classList.add('hidden');
-        document.getElementById(stepId).classList.remove('hidden');
-    }
+    <script>
+        let fotoData = "";
 
-    // Auto-lock check
-    window.onload = () => {
-        if (localStorage.getItem('isLocked')) {
-            renderLocked();
-            goToStep('viewLocked');
+        function showView(viewId) {
+            // Sembunyikan semua card
+            document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+            // Tampilkan yang dipilih
+            document.getElementById(viewId).classList.remove('hidden');
+            
+            if(viewId === 'viewGuru') renderTabel();
         }
-    }
 
-    // Ambil Foto
-    function captureSelfie() {
-        const input = document.createElement('input');
-        input.type = 'file'; input.accept = 'image/*'; input.capture = 'user';
-        input.onchange = (e) => {
-            const reader = new FileReader();
-            reader.onload = (f) => {
-                document.getElementById('photoPreview').src = f.target.result;
-                document.getElementById('photoPreview').style.display = 'block';
-                document.getElementById('btnKirim').style.display = 'block';
+        function ambilFoto() {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = 'image/*'; input.capture = 'user';
+            input.onchange = e => {
+                const reader = new FileReader();
+                reader.onload = f => {
+                    fotoData = f.target.result;
+                    document.getElementById('previewImg').src = fotoData;
+                    document.getElementById('previewImg').style.display = 'block';
+                    document.getElementById('btnKirim').classList.remove('hidden');
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            };
+            input.click();
+        }
+
+        function kirimAbsen() {
+            const nama = document.getElementById('namaSiswa').value;
+            const kelas = document.getElementById('kelasSiswa').value;
+            const ket = document.getElementById('ketSiswa').value;
+            const jam = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+
+            if(!nama) return alert("Isi nama dulu!");
+
+            // SIMPAN DATA KE LOCALSTORAGE (DATABASE DEMO)
+            let db = JSON.parse(localStorage.getItem('db_absen')) || [];
+            db.push({ nama, kelas, ket, jam, foto: fotoData });
+            localStorage.setItem('db_absen', JSON.stringify(db));
+
+            alert("Selamat " + nama + ", absen berhasil!");
+            location.reload(); // Refresh balik ke awal
+        }
+
+        function renderTabel() {
+            const db = JSON.parse(localStorage.getItem('db_absen')) || [];
+            const tbody = document.querySelector('#tabelGuru tbody');
+            tbody.innerHTML = "";
+
+            db.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="${s.foto}" class="img-preview"></td>
+                        <td>${s.nama}<br><small>${s.kelas}</small></td>
+                        <td>${s.jam}</td>
+                        <td>${s.ket}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function hapusSemuaData() {
+            if(confirm("Hapus semua rekap absensi?")) {
+                localStorage.removeItem('db_absen');
+                renderTabel();
             }
-            reader.readAsDataURL(e.target.files[0]);
         }
-        input.click();
-    }
-
-    // Submit & Lock
-    function prosesSelesai() {
-        const nama = document.getElementById('realNama').value;
-        if (!nama) return alert("Isi namamu dulu ya!");
-
-        const jam = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-        const ket = document.getElementById('realKet').value;
-
-        localStorage.setItem('isLocked', 'true');
-        localStorage.setItem('dataNama', nama);
-        localStorage.setItem('dataJam', jam);
-        localStorage.setItem('dataKet', ket);
-
-        renderLocked();
-        goToStep('viewLocked');
-    }
-
-    function renderLocked() {
-        document.getElementById('msgNama').innerText = "Selamat " + localStorage.getItem('dataNama') + ", absensi kamu telah diterima.";
-        document.getElementById('resWaktu').innerText = localStorage.getItem('dataJam') + " WIB";
-        document.getElementById('resStatus').innerText = localStorage.getItem('dataKet');
-    }
-</script>
-
+    </script>
 </body>
 </html>
