@@ -1,46 +1,939 @@
-<!-- TAMBAHKAN SCRIPT INI DI BAWAH SEMUA FUNCTION -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard - UMKM Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 
-<script>
+    <style>
+        * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-// SIMPAN HALAMAN TERAKHIR
-function saveView(viewId){
+        :root {
+            --color-primary: #7c3aed;
+            --color-secondary: #3b82f6;
+            --color-accent: #8b5cf6;
+            --color-success: #10b981;
+            --color-danger: #ef4444;
+            --color-warning: #f59e0b;
+        }
 
-localStorage.setItem('last_view', viewId);
+        .page-transition {
+            transition: all 0.3s ease-in-out;
+        }
 
-}
+        .card-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
 
-// MODIFIKASI FUNCTION showView
-function showView(id){
+        @media print {
+            body > * { display: none !important; }
+            #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
 
-document.querySelectorAll('.card').forEach(card=>{
-card.classList.add('hidden');
-});
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased transition-colors duration-200">
 
-document.getElementById(id).classList.remove('hidden');
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <nav class="no-print w-full md:w-64 bg-white dark:bg-slate-950 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-row md:flex-col justify-between p-4 fixed bottom-0 md:sticky md:top-0 z-40 h-16 md:h-screen shadow-lg md:shadow-none">
+            <div class="flex flex-row md:flex-col items-center md:items-start w-full justify-around md:justify-start gap-0 md:gap-6">
+                <div class="hidden md:flex items-center gap-3 px-2 mb-4">
+                    <div class="p-2.5 bg-purple-600 text-white rounded-xl shadow-md shadow-purple-500/20">
+                        <i data-feather="activity" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-tight leading-none text-purple-600 dark:text-purple-400">BizFinance</h1>
+                        <span class="text-xs text-slate-400 dark:text-slate-500">UMKM Management</span>
+                    </div>
+                </div>
 
-saveView(id);
+                <div class="flex flex-row md:flex-col w-full justify-around md:justify-start gap-1 md:gap-1.5">
+                    <button onclick="switchPage('dashboard')" id="nav-dashboard" class="flex flex-col md:flex-row items-center gap-1 md:gap-3 px-3 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-medium w-full transition-all text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40">
+                        <i data-feather="grid" class="w-5 h-5"></i> <span class="hidden md:inline">Dashboard</span>
+                    </button>
+                    <button onclick="switchPage('transactions')" id="nav-transactions" class="flex flex-col md:flex-row items-center gap-1 md:gap-3 px-3 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-medium w-full transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900">
+                        <i data-feather="list" class="w-5 h-5"></i> <span class="hidden md:inline">Transaksi</span>
+                    </button>
+                    <button onclick="switchPage('employees')" id="nav-employees" class="flex flex-col md:flex-row items-center gap-1 md:gap-3 px-3 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-medium w-full transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900">
+                        <i data-feather="users" class="w-5 h-5"></i> <span class="hidden md:inline">Karyawan</span>
+                    </button>
+                    <button onclick="switchPage('reports')" id="nav-reports" class="flex flex-col md:flex-row items-center gap-1 md:gap-3 px-3 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-medium w-full transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900">
+                        <i data-feather="bar-chart-2" class="w-5 h-5"></i> <span class="hidden md:inline">Laporan</span>
+                    </button>
+                </div>
+            </div>
 
-if(id === 'dashboardGuru'){
-renderTable();
-}
+            <div class="hidden md:block w-full pt-4 border-t border-slate-100 dark:border-slate-900">
+                <button onclick="toggleDarkMode()" class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all">
+                    <div class="flex items-center gap-3">
+                        <i data-feather="moon" class="w-5 h-5 dark:hidden"></i>
+                        <i data-feather="sun" class="w-5 h-5 hidden dark:block text-amber-500"></i>
+                        <span class="dark:hidden">Mode Gelap</span>
+                        <span class="hidden dark:block text-amber-500">Mode Terang</span>
+                    </div>
+                </button>
+            </div>
+        </nav>
 
-}
+        <main class="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-x-hidden w-full">
+            
+            <header class="no-print flex items-center justify-between mb-6 md:mb-8">
+                <div>
+                    <h2 id="page-title" class="text-xl md:text-2xl font-bold tracking-tight">Ringkasan Finansial</h2>
+                    <p id="page-subtitle" class="text-xs md:text-sm text-slate-500 dark:text-slate-400">Pantau performa bisnis Anda secara real-time.</p>
+                </div>
+                
+                <div class="flex items-center gap-2.5">
+                    <button onclick="toggleDarkMode()" class="md:hidden p-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 shadow-sm">
+                        <i data-feather="moon" class="w-5 h-5 dark:hidden"></i>
+                        <i data-feather="sun" class="w-5 h-5 hidden dark:block text-amber-500"></i>
+                    </button>
+                    <button onclick="openTransactionModal()" class="flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl shadow-md shadow-purple-500/10 transition-all text-sm">
+                        <i data-feather="plus" class="w-4 h-4"></i> <span>Transaksi</span>
+                    </button>
+                </div>
+            </header>
 
-// SAAT WEBSITE DIRELOAD
-window.onload = function(){
+            <div id="page-dashboard" class="page-transition space-y-6 md:space-y-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                    <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm card-hover relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Saldo</p>
+                            <span class="p-2 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl"><i data-feather="wallet" class="w-4 h-4"></i></span>
+                        </div>
+                        <h3 id="stat-balance" class="text-xl md:text-2xl font-bold tracking-tight">Rp 0</h3>
+                        <div class="mt-2 text-xs flex items-center gap-1 text-slate-400"><i data-feather="info" class="w-3 h-3"></i> <span>Akumulasi kas aktif</span></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm card-hover relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Pemasukan (Bulan Ini)</p>
+                            <span class="p-2 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl"><i data-feather="trending-up" class="w-4 h-4"></i></span>
+                        </div>
+                        <h3 id="stat-income" class="text-xl md:text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">Rp 0</h3>
+                    </div>
+                    <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm card-hover relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Pengeluaran (Bulan Ini)</p>
+                            <span class="p-2 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl"><i data-feather="trending-down" class="w-4 h-4"></i></span>
+                        </div>
+                        <h3 id="stat-expense" class="text-xl md:text-2xl font-bold tracking-tight text-rose-600 dark:text-rose-400">Rp 0</h3>
+                    </div>
+                    <div class="bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm card-hover relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Karyawan</p>
+                            <span class="p-2 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-xl"><i data-feather="users" class="w-4 h-4"></i></span>
+                        </div>
+                        <h3 id="stat-employees" class="text-xl md:text-2xl font-bold tracking-tight">0 Org</h3>
+                        <div id="stat-salary-info" class="mt-2 text-xs flex items-center gap-1 text-slate-400"></div>
+                    </div>
+                </div>
 
-const lastView = localStorage.getItem('last_view');
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white dark:bg-slate-950 p-4 md:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between min-h-[350px]">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-sm md:text-base">Arus Kas Berjalan</h4>
+                            <span class="text-xs text-slate-400">6 Bulan terakhir</span>
+                        </div>
+                        <div class="flex-1 relative w-full h-full">
+                            <canvas id="chartMainFlow"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-950 p-4 md:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between min-h-[350px]">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-sm md:text-base">Struktur Pengeluaran</h4>
+                            <span class="text-xs text-slate-400">Proporsi biaya</span>
+                        </div>
+                        <div class="flex-1 relative w-full h-full flex items-center justify-center">
+                            <canvas id="chartStructure"></canvas>
+                        </div>
+                    </div>
+                </div>
 
-if(lastView){
+                <div class="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 dark:border-slate-900 flex justify-between items-center">
+                        <h4 class="font-bold text-sm md:text-base">Aktivitas Terakhir</h4>
+                        <button onclick="switchPage('transactions')" class="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline">Lihat Semua</button>
+                    </div>
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50/70 dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 uppercase text-[10px] font-bold tracking-wider border-b border-slate-100 dark:border-slate-900">
+                                    <th class="py-3 px-5">Tanggal</th>
+                                    <th class="py-3 px-5">Deskripsi</th>
+                                    <th class="py-3 px-5">Kategori</th>
+                                    <th class="py-3 px-5 text-right">Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-recent" class="divide-y divide-slate-100 dark:divide-slate-900 text-sm">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-showView(lastView);
+            <div id="page-transactions" class="page-transition hidden space-y-6">
+                <div class="bg-white dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
+                    <div class="relative w-full sm:w-72">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i data-feather="search" class="w-4 h-4"></i></span>
+                        <input type="text" id="searchTransaction" placeholder="Cari transaksi..." class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <select id="filterType" class="w-full sm:w-40 px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-purple-500">
+                            <option value="all">Semua Tipe</option>
+                            <option value="income">Pemasukan</option>
+                            <option value="expense">Pengeluaran</option>
+                        </select>
+                    </div>
+                </div>
 
-}else{
+                <div class="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50/70 dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 uppercase text-[10px] font-bold tracking-wider border-b border-slate-100 dark:border-slate-900">
+                                    <th class="py-3.5 px-5">Tanggal</th>
+                                    <th class="py-3.5 px-5">Deskripsi</th>
+                                    <th class="py-3.5 px-5">Kategori</th>
+                                    <th class="py-3.5 px-5 text-right">Nominal</th>
+                                    <th class="py-3.5 px-5 text-center no-print">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-transactions" class="divide-y divide-slate-100 dark:divide-slate-900 text-sm">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-showView('home');
+            <div id="page-employees" class="page-transition hidden space-y-6">
+                <div class="flex justify-end">
+                    <button onclick="openEmployeeModal()" class="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-medium rounded-xl text-sm shadow-sm">
+                        <i data-feather="user-plus" class="w-4 h-4"></i> <span>Tambah Karyawan</span>
+                    </button>
+                </div>
 
-}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="employees-grid">
+                    </div>
+            </div>
 
-};
+            <div id="page-reports" class="page-transition hidden space-y-6">
+                <div class="bg-white dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap gap-3 items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <select id="reportMonth" class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none">
+                            <option value="all">Sepanjang Waktu</option>
+                            <option value="0">Januari</option><option value="1">Februari</option>
+                            <option value="2">Maret</option><option value="3">April</option>
+                            <option value="4">Mei</option><option value="5">Juni</option>
+                            <option value="6">Juli</option><option value="7">Agustus</option>
+                            <option value="8">September</option><option value="9">Oktober</option>
+                            <option value="10">November</option><option value="11">Desember</option>
+                        </select>
+                        <select id="reportYear" class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none">
+                            </select>
+                    </div>
+                    <button onclick="generateReport()" class="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium">
+                        <i data-feather="printer" class="w-4 h-4"></i> Cetak Laporan (PDF)
+                    </button>
+                </div>
 
-</script>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm min-h-[300px] flex flex-col justify-between">
+                        <h4 class="font-bold text-sm mb-4">Komparasi Sektor Pemasukan</h4>
+                        <div class="flex-1 relative w-full h-full flex items-center justify-center">
+                            <canvas id="chartReportIncome"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm min-h-[300px] flex flex-col justify-between">
+                        <h4 class="font-bold text-sm mb-4">Komparasi Sektor Pengeluaran</h4>
+                        <div class="flex-1 relative w-full h-full flex items-center justify-center">
+                            <canvas id="chartReportExpense"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="transactionModal" class="no-print fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white dark:bg-slate-950 w-full max-w-md p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl m-4 transform scale-95 transition-transform duration-200">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold">Catat Transaksi Baru</h3>
+                <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-600"><i data-feather="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl">
+                    <button id="btn-type-income" onclick="setTransType('income')" class="py-2 text-sm font-semibold rounded-lg transition-all bg-white dark:bg-slate-950 shadow-sm text-emerald-600 dark:text-emerald-400">Pemasukan</button>
+                    <button id="btn-type-expense" onclick="setTransType('expense')" class="py-2 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700">Pengeluaran</button>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Deskripsi / Nama Transaksi</label>
+                    <input type="text" id="transDesc" placeholder="Contoh: Penjualan produk jilbab" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-purple-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Nominal (IDR)</label>
+                        <input type="number" id="transAmount" min="0" placeholder="0" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Kategori</label>
+                        <select id="transCategory" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-purple-500">
+                            </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Tanggal Transaksi</label>
+                    <input type="date" id="transDate" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-purple-500">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4">
+                    <button onclick="closeTransactionModal()" class="px-4 py-2 text-sm font-medium border border-slate-200 dark:border-slate-800 rounded-xl">Batal</button>
+                    <button onclick="saveTransaction()" class="px-4 py-2 text-sm font-medium bg-purple-600 text-white rounded-xl shadow-md shadow-purple-500/10">Simpan Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="employeeModal" class="no-print fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white dark:bg-slate-950 w-full max-w-md p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl m-4 transform scale-95 transition-transform duration-200">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold">Data Karyawan</h3>
+                <button onclick="closeEmployeeModal()" class="text-slate-400 hover:text-slate-600"><i data-feather="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <input type="hidden" id="empId">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Nama Lengkap</label>
+                    <input type="text" id="empName" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Jabatan / Posisi</label>
+                    <input type="text" id="empRole" placeholder="Misal: Kasir, Admin" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Gaji Pokok Bulanan (IDR)</label>
+                    <input type="number" id="empSalary" min="0" placeholder="0" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-purple-500">
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button onclick="closeEmployeeModal()" class="px-4 py-2 text-sm font-medium border border-slate-200 dark:border-slate-800 rounded-xl">Batal</button>
+                    <button onclick="saveEmployee()" class="px-4 py-2 text-sm font-medium bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl">Simpan Karyawan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="no-print fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white dark:bg-slate-950 w-full max-w-sm p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl m-4 transform scale-95 transition-transform duration-200 text-center">
+            <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-feather="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-base font-bold mb-1">Hapus Data Permanen?</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-center gap-3">
+                <button onclick="closeDeleteModal()" class="px-4 py-1.5 text-xs font-medium border border-slate-200 dark:border-slate-800 rounded-lg">Batal</button>
+                <button id="btn-confirm-delete" class="px-4 py-1.5 text-xs font-medium bg-rose-600 text-white rounded-lg shadow-md shadow-rose-500/10">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="print-area" class="hidden p-10 text-slate-900 bg-white"></div>
+
+    <div id="toast" class="no-print fixed bottom-20 md:bottom-6 right-6 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-950 text-xs font-semibold rounded-xl shadow-lg flex items-center gap-2 transform translate-y-10 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+        <i data-feather="check-circle" class="w-4 h-4 text-emerald-500"></i>
+        <span id="toast-msg">Data berhasil diproses</span>
+    </div>
+
+    <footer class="no-print text-center text-[10px] text-slate-400 dark:text-slate-600 py-4 mt-8 mb-16 md:mb-0 border-t border-slate-100 dark:border-slate-900/60 w-full">
+        &copy; 2026 BizFinance. Dibuat oleh Deby Verona. Hak Cipta Dilindungi.
+    </footer>
+
+    <script>
+        // Masukkan URL Google Apps Script Web App Anda di sini untuk sinkronisasi cloud
+        const SPREADSHEET_API_URL = "https://script.google.com/macros/s/AKfycbyKX6Cf-l-UKxT4CGoNulh8TblSWXzFw0t6GD29d_MVV-1sEXGXbEf0-3Mdw_w5wC2Vvg/exec";
+
+        let currentPage = 'dashboard';
+        let transactions = [];
+        let employees = [];
+        let currentTransType = 'income';
+        let chartInstances = { main: null, structure: null, repIncome: null, repExpense: null };
+
+        const CATEGORIES = {
+            income: ['Penjualan Produk', 'Jasa / Layanan', 'Investasi', 'Pendapatan Lain'],
+            expense: ['Gaji Karyawan', 'Operasional Toko', 'Bahan Baku', 'Pemasaran', 'Biaya Sewa', 'Lain-lain']
+        };
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function generateId() {
+            return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11);
+        }
+
+        function formatIDR(num) {
+            return 'Rp ' + Number(num).toLocaleString('id-ID', { minimumFractionDigits: 0 });
+        }
+
+        function todayString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-10', 'opacity-0'), 3000);
+        }
+
+        function saveData() {
+            localStorage.setItem('finance_transactions', JSON.stringify(transactions));
+            localStorage.setItem('finance_employees', JSON.stringify(employees));
+
+            const payload = {
+                type: "finance_backup",
+                content: JSON.stringify({
+                    transactions: JSON.stringify(transactions),
+                    employees: JSON.stringify(employees)
+                })
+            };
+
+            fetch(SPREADSHEET_API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/plain" },
+                body: JSON.stringify(payload)
+            }).catch(err => console.error("Cloud Sinkronisasi Gagal:", err));
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch(SPREADSHEET_API_URL);
+                const resData = await response.json();
+                if (resData && resData.content) {
+                    const originalData = JSON.parse(resData.content);
+                    transactions = JSON.parse(originalData.transactions) || [];
+                    employees = JSON.parse(originalData.employees) || [];
+                } else {
+                    transactions = JSON.parse(localStorage.getItem('finance_transactions')) || [];
+                    employees = JSON.parse(localStorage.getItem('finance_employees')) || [];
+                }
+            } catch (error) {
+                transactions = JSON.parse(localStorage.getItem('finance_transactions')) || [];
+                employees = JSON.parse(localStorage.getItem('finance_employees')) || [];
+            }
+        }
+
+        function switchPage(pageId) {
+            const pages = ['dashboard', 'transactions', 'employees', 'reports'];
+            pages.forEach(p => {
+                document.getElementById(`page-${p}`).classList.add('hidden');
+                document.getElementById(`nav-${p}`).className = "flex flex-col md:flex-row items-center gap-1 md:gap-3 px-3 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-medium w-full transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900";
+            });
+
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            document.getElementById(`nav-${pageId}`).className = "flex flex-col md:flex-row items-center gap-1 md:gap-3 px-3 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-medium w-full transition-all text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40";
+            
+            currentPage = pageId;
+            
+            const titles = { dashboard: 'Ringkasan Finansial', transactions: 'Daftar Transaksi Kas', employees: 'Manajemen Staff & Gaji', reports: 'Pusat Analisis Laporan' };
+            const subtitles = { dashboard: 'Pantau performa bisnis Anda secara real-time.', transactions: 'Seluruh riwayat keluar-masuk dana perusahaan.', employees: 'Atur data pekerja beserta kalkulasi payroll operasional.', reports: 'Eksportasi visual grafik pembukuan ke lembar cetak.' };
+            
+            document.getElementById('page-title').innerText = titles[pageId];
+            document.getElementById('page-subtitle').innerText = subtitles[pageId];
+
+            if(pageId === 'dashboard') { initCharts(); updateDashboard(); updateRecentTransactions(); }
+            if(pageId === 'transactions') { updateTransactionsList(); }
+            if(pageId === 'employees') { updateEmployeesList(); }
+            if(pageId === 'reports') { initReportYears(); updateReportView(); }
+        }
+
+        function initDarkMode() {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            Object.values(chartInstances).forEach(c => { if(c) c.destroy(); });
+            if(currentPage === 'dashboard') initCharts();
+            if(currentPage === 'reports') updateReportView();
+        }
+
+        function updateDashboard() {
+            let totalIncome = 0; let totalExpense = 0;
+            const now = new Date();
+            const curMonth = now.getMonth(); const curYear = now.getFullYear();
+            let balance = 0;
+
+            transactions.forEach(t => {
+                const amt = Number(t.amount);
+                const tDate = new Date(t.date);
+                if (t.type === 'income') balance += amt; else balance -= amt;
+
+                if(tDate.getMonth() === curMonth && tDate.getFullYear() === curYear) {
+                    if (t.type === 'income') totalIncome += amt; else totalExpense += amt;
+                }
+            });
+
+            document.getElementById('stat-balance').innerText = formatIDR(balance);
+            document.getElementById('stat-income').innerText = formatIDR(totalIncome);
+            document.getElementById('stat-expense').innerText = formatIDR(totalExpense);
+            document.getElementById('stat-employees').innerText = `${employees.length} Orang`;
+
+            let totalSalary = employees.reduce((acc, e) => acc + Number(e.salary), 0);
+            document.getElementById('stat-salary-info').innerHTML = `<i data-feather="credit-card" class="w-3 h-3"></i> Beban gaji: ${formatIDR(totalSalary)}/bln`;
+            feather.replace();
+        }
+
+        function updateRecentTransactions() {
+            const sorted = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            const body = document.getElementById('table-recent');
+            body.innerHTML = '';
+
+            if(sorted.length === 0) {
+                body.innerHTML = `<tr><td colspan="4" class="p-5 text-center text-slate-400">Belum ada transaksi terekam.</td></tr>`;
+                return;
+            }
+
+            sorted.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-5 text-slate-500">${new Date(t.date).toLocaleDateString('id-ID', {day:'numeric', month:'short'})}</td>
+                    <td class="py-3 px-5 font-medium">${escapeHtml(t.desc)}</td>
+                    <td class="py-3 px-5"><span class="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400">${t.category}</span></td>
+                    <td class="py-3 px-5 text-right font-semibold ${t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
+                        ${t.type === 'income' ? '+' : '-'} ${formatIDR(t.amount)}
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function updateTransactionsList() {
+            const search = document.getElementById('searchTransaction').value.toLowerCase();
+            const filter = document.getElementById('filterType').value;
+            const body = document.getElementById('table-transactions');
+            body.innerHTML = '';
+
+            let filtered = transactions.filter(t => {
+                const matchesSearch = t.desc.toLowerCase().includes(search) || t.category.toLowerCase().includes(search);
+                const matchesFilter = filter === 'all' || t.type === filter;
+                return matchesSearch && matchesFilter;
+            });
+
+            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            if(filtered.length === 0) {
+                body.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400">Tidak ada transaksi ditemukan.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3.5 px-5 text-slate-500">${new Date(t.date).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</td>
+                    <td class="py-3.5 px-5 font-medium">${escapeHtml(t.desc)}</td>
+                    <td class="py-3.5 px-5"><span class="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400">${t.category}</span></td>
+                    <td class="py-3.5 px-5 text-right font-semibold ${t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
+                        ${t.type === 'income' ? '+' : '-'} ${formatIDR(t.amount)}
+                    </td>
+                    <td class="py-3.5 px-5 text-center no-print">
+                        <button onclick="triggerDeleteTransaction('${t.id}')" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/20 dark:hover:bg-rose-950/50 rounded-lg transition-all"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+            feather.replace();
+        }
+
+        function openTransactionModal() {
+            const m = document.getElementById('transactionModal');
+            m.classList.remove('hidden');
+            setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10);
+        }
+
+        function closeTransactionModal() {
+            const m = document.getElementById('transactionModal');
+            m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95');
+            setTimeout(() => { m.classList.add('hidden'); document.getElementById('transDesc').value = ''; document.getElementById('transAmount').value = ''; }, 200);
+        }
+
+        function setTransType(type) {
+            currentTransType = type;
+            const incBtn = document.getElementById('btn-type-income');
+            const expBtn = document.getElementById('btn-type-expense');
+            const catSelect = document.getElementById('transCategory');
+
+            if(type === 'income') {
+                incBtn.className = "py-2 text-sm font-semibold rounded-lg transition-all bg-white dark:bg-slate-950 shadow-sm text-emerald-600 dark:text-emerald-400";
+                expBtn.className = "py-2 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700";
+            } else {
+                expBtn.className = "py-2 text-sm font-semibold rounded-lg transition-all bg-white dark:bg-slate-950 shadow-sm text-rose-600 dark:text-rose-400";
+                incBtn.className = "py-2 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700";
+            }
+
+            catSelect.innerHTML = '';
+            CATEGORIES[type].forEach(c => {
+                catSelect.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+        }
+
+        function saveTransaction() {
+            const desc = document.getElementById('transDesc').value.trim();
+            const amount = Math.abs(parseFloat(document.getElementById('transAmount').value));
+            const category = document.getElementById('transCategory').value;
+            const date = document.getElementById('transDate').value;
+
+            if(!desc || !amount || !date) { alert('Semua kolom wajib diisi dengan benar!'); return; }
+
+            const newTx = { id: generateId(), desc, amount, type: currentTransType, category, date };
+            transactions.push(newTx);
+            
+            saveData();
+            closeTransactionModal();
+            if(currentPage === 'dashboard') { updateDashboard(); updateRecentTransactions(); initCharts(); }
+            if(currentPage === 'transactions') { updateTransactionsList(); }
+            showToast('Transaksi berhasil dicatat!');
+        }
+
+        function triggerDeleteTransaction(id) {
+            const m = document.getElementById('deleteModal');
+            m.classList.remove('hidden');
+            setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10);
+            
+            document.getElementById('btn-confirm-delete').onclick = () => {
+                transactions = transactions.filter(t => t.id !== id);
+                saveData();
+                closeDeleteModal();
+                updateTransactionsList();
+                showToast('Transaksi berhasil dihapus.');
+            };
+        }
+
+        function closeDeleteModal() {
+            const m = document.getElementById('deleteModal');
+            m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95');
+            setTimeout(() => m.classList.add('hidden'), 200);
+        }
+
+        function updateEmployeesList() {
+            const grid = document.getElementById('employees-grid');
+            grid.innerHTML = '';
+
+            if(employees.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400">Belum ada data staf terdaftar.</div>`;
+                return;
+            }
+
+            employees.forEach(e => {
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-xl flex items-center justify-center font-bold text-sm">${e.name.charAt(0)}</div>
+                            <div class="flex items-center gap-1.5 no-print">
+                                <button onclick="openEmployeeModal('${e.id}')" class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-all"><i data-feather="edit-3" class="w-4 h-4"></i></button>
+                                <button onclick="triggerDeleteEmployee('${e.id}')" class="p-1.5 text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-all"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-base tracking-tight">${escapeHtml(e.name)}</h4>
+                        <p class="text-xs text-slate-400 mb-4">${escapeHtml(e.role)}</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-900 flex justify-between items-center">
+                        <span class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Gaji Pokok</span>
+                        <span class="font-bold text-sm text-slate-700 dark:text-slate-300">${formatIDR(e.salary)}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            feather.replace();
+        }
+
+        function openEmployeeModal(id = null) {
+            const m = document.getElementById('employeeModal');
+            m.classList.remove('hidden');
+            setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10);
+
+            if(id) {
+                const e = employees.find(emp => emp.id === id);
+                document.getElementById('empId').value = e.id;
+                document.getElementById('empName').value = e.name;
+                document.getElementById('empRole').value = e.role;
+                document.getElementById('empSalary').value = e.salary;
+            } else {
+                document.getElementById('empId').value = '';
+                document.getElementById('empName').value = '';
+                document.getElementById('empRole').value = '';
+                document.getElementById('empSalary').value = '';
+            }
+        }
+
+        function closeEmployeeModal() {
+            const m = document.getElementById('employeeModal');
+            m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95');
+            setTimeout(() => m.classList.add('hidden'), 200);
+        }
+
+        function saveEmployee() {
+            const id = document.getElementById('empId').value;
+            const name = document.getElementById('empName').value.trim();
+            const role = document.getElementById('empRole').value.trim();
+            const salary = Math.abs(parseFloat(document.getElementById('empSalary').value));
+
+            if(!name || !role || isNaN(salary)) { alert('Mohon isi semua data karyawan dengan valid!'); return; }
+
+            if(id) {
+                const e = employees.find(emp => emp.id === id);
+                e.name = name; e.role = role; e.salary = salary;
+            } else {
+                employees.push({ id: generateId(), name, role, salary });
+            }
+
+            saveData();
+            closeEmployeeModal();
+            updateEmployeesList();
+            showToast('Data karyawan diperbarui.');
+        }
+
+        function triggerDeleteEmployee(id) {
+            const m = document.getElementById('deleteModal');
+            m.classList.remove('hidden');
+            setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10);
+
+            document.getElementById('btn-confirm-delete').onclick = () => {
+                employees = employees.filter(e => e.id !== id);
+                saveData();
+                closeDeleteModal();
+                updateEmployeesList();
+                showToast('Karyawan berhasil dihapus.');
+            };
+        }
+
+        function initReportYears() {
+            const select = document.getElementById('reportYear');
+            select.innerHTML = '';
+            const years = [...new Set(transactions.map(t => new Date(t.date).getFullYear()))];
+            if(years.length === 0) years.push(new Date().getFullYear());
+            years.forEach(y => {
+                select.innerHTML += `<option value="${y}">${y}</option>`;
+            });
+            select.addEventListener('change', updateReportView);
+            document.getElementById('reportMonth').addEventListener('change', updateReportView);
+        }
+
+        function updateReportView() {
+            const mFilter = document.getElementById('reportMonth').value;
+            const yFilter = parseInt(document.getElementById('reportYear').value);
+
+            let filtered = transactions.filter(t => {
+                const d = new Date(t.date);
+                const mMatch = mFilter === 'all' || d.getMonth() === parseInt(mFilter);
+                const yMatch = d.getFullYear() === yFilter;
+                return mMatch && yMatch;
+            });
+
+            let incData = {}; let expData = {};
+            CATEGORIES.income.forEach(c => incData[c] = 0);
+            CATEGORIES.expense.forEach(c => expData[c] = 0);
+
+            filtered.forEach(t => {
+                if(t.type === 'income' && incData[t.category] !== undefined) incData[t.category] += Number(t.amount);
+                if(t.type === 'expense' && expData[t.category] !== undefined) expData[t.category] += Number(t.amount);
+            });
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const textCfg = { color: isDark ? '#94a3b8' : '#64748b', font: { family: 'Inter, sans-serif' } };
+
+            if(chartInstances.repIncome) chartInstances.repIncome.destroy();
+            chartInstances.repIncome = new Chart(document.getElementById('chartReportIncome'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(incData),
+                    datasets: [{ data: Object.values(incData), backgroundColor: '#10b981', borderRadius: 8 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { ticks: textCfg, grid: { color: isDark?'#334155':'#f1f5f9' } }, x: { ticks: textCfg, grid: { display:false } } }
+                }
+            });
+
+            if(chartInstances.repExpense) chartInstances.repExpense.destroy();
+            chartInstances.repExpense = new Chart(document.getElementById('chartReportExpense'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(expData),
+                    datasets: [{ data: Object.values(expData), backgroundColor: '#ef4444', borderRadius: 8 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { ticks: textCfg, grid: { color: isDark?'#334155':'#f1f5f9' } }, x: { ticks: textCfg, grid: { display:false } } }
+                }
+            });
+        }
+
+        function generateReport() {
+            const mText = document.getElementById('reportMonth').options[document.getElementById('reportMonth').selectedIndex].text;
+            const yText = document.getElementById('reportYear').value;
+            const area = document.getElementById('print-area');
+
+            const mFilter = document.getElementById('reportMonth').value;
+            const yFilter = parseInt(yText);
+            let filtered = transactions.filter(t => {
+                const d = new Date(t.date);
+                return (mFilter === 'all' || d.getMonth() === parseInt(mFilter)) && d.getFullYear() === yFilter;
+            });
+
+            let totalIn = 0; let totalOut = 0;
+            let rowsHtml = filtered.map(t => {
+                if (t.type === 'income') totalIn += Number(t.amount); else totalOut += Number(t.amount);
+                return `
+                    <tr style="border-bottom: 1px solid #e2e8f0; font-size: 12px;">
+                        <td style="padding: 8px;">${new Date(t.date).toLocaleDateString('id-ID')}</td>
+                        <td style="padding: 8px;">${escapeHtml(t.desc)}</td>
+                        <td style="padding: 8px;">${t.category}</td>
+                        <td style="padding: 8px; text-align: right; color: ${t.type==='income'?'#10b981':'#ef4444'}">${t.type==='income'?'+':'-'} ${formatIDR(t.amount)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            area.innerHTML = `
+                <div style="font-family: Arial, sans-serif; line-height: 1.5; padding-bottom: 40px;">
+                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #334155; padding-bottom: 10px;">
+                        <h2 style="margin: 0; color: #7c3aed;">LAPORAN KEUANGAN UMKM (BIZFINANCE)</h2>
+                        <p style="margin: 5px 0 0 0; font-size: 14px; color: #64748b;">Periode: ${mText} ${yText}</p>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 25px; background: #f8fafc; padding: 15px; border-radius: 8px;">
+                        <div><span style="font-size:12px; color:#64748b;">Total Pemasukan:</span><br><strong style="color:#10b981; font-size:16px;">${formatIDR(totalIn)}</strong></div>
+                        <div><span style="font-size:12px; color:#64748b;">Total Pengeluaran:</span><br><strong style="color:#ef4444; font-size:16px;">${formatIDR(totalOut)}</strong></div>
+                        <div><span style="font-size:12px; color:#64748b;">Saldo Bersih:</span><br><strong style="color:#3b82f6; font-size:16px;">${formatIDR(totalIn - totalOut)}</strong></div>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 40px;">
+                        <thead>
+                            <tr style="background: #334155; color: white; font-size: 11px; text-transform: uppercase;">
+                                <th style="padding: 10px;">Tanggal</th><th style="padding: 10px;">Deskripsi</th><th style="padding: 10px;">Kategori</th><th style="padding: 10px; text-align: right;">Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml || '<tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8;">Tidak ada data pada periode ini.</td></tr>'}</tbody>
+                    </table>
+                </div>
+            `;
+            window.print();
+        }
+
+        function initCharts() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textCfg = { color: isDark ? '#94a3b8' : '#64748b', font: { family: 'Inter, sans-serif', size: 11 } };
+
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'];
+            let incDataset = [0, 0, 0, 0, 0, 0];
+            let expDataset = [0, 0, 0, 0, 0, 0];
+
+            transactions.forEach(t => {
+                const d = new Date(t.date);
+                if(d.getFullYear() === new Date().getFullYear() && d.getMonth() < 6) {
+                    if (t.type === 'income') incDataset[d.getMonth()] += Number(t.amount);
+                    else expDataset[d.getMonth()] += Number(t.amount);
+                }
+            });
+
+            if(chartInstances.main) chartInstances.main.destroy();
+            chartInstances.main = new Chart(document.getElementById('chartMainFlow'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Masuk', data: incDataset, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.05)', tension: 0.3, fill: true },
+                        { label: 'Keluar', data: expDataset, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.05)', tension: 0.3, fill: true }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: textCfg.color } } },
+                    scales: { y: { ticks: textCfg, grid: { color: isDark?'#1e293b':'#f1f5f9' } }, x: { ticks: textCfg, grid: { display: false } } }
+                }
+            });
+
+            let structData = {};
+            CATEGORIES.expense.forEach(c => structData[c] = 0);
+            transactions.filter(t => t.type === 'expense').forEach(t => { if(structData[t.category]!==undefined) structData[t.category] += Number(t.amount); });
+
+            if(chartInstances.structure) chartInstances.structure.destroy();
+            chartInstances.structure = new Chart(document.getElementById('chartStructure'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(structData),
+                    datasets: [{ data: Object.values(structData), backgroundColor: ['#8b5cf6', '#3b82f6', '#f59e0b', '#ef4444', '#10b981', '#64748b'] }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, color: textCfg.color, padding: 15 } } }
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('searchTransaction')?.addEventListener('input', updateTransactionsList);
+            document.getElementById('filterType')?.addEventListener('change', updateTransactionsList);
+
+            document.getElementById('transactionModal')?.addEventListener('click', e => { if (e.target.id === 'transactionModal') closeTransactionModal(); });
+            document.getElementById('deleteModal')?.addEventListener('click', e => { if (e.target.id === 'deleteModal') closeDeleteModal(); });
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') { closeTransactionModal(); closeEmployeeModal(); closeDeleteModal(); }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initDarkMode();
+            await loadData();
+
+            document.getElementById('transDate').value = todayString();
+            setTransType('income');
+
+            initCharts();
+            updateDashboard();
+            updateRecentTransactions();
+            updateTransactionsList();
+            updateEmployeesList();
+            setupEventListeners();
+
+            feather.replace();
+        });
+    </script>
+</body>
+</html>
